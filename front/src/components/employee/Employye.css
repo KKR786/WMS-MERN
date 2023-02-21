@@ -1,0 +1,219 @@
+html {
+	height: 100%;
+}
+body {
+    background-color: #1b2431;
+    color: #202020;
+    font-family: "Montserrat", "Helvetica", "Open Sans", "Arial";
+    font-size: 13px;
+    margin: 0;
+	height: 100%;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+p,
+figure {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: #fff;
+}
+.navbar-brand{
+    background: #fff;
+}
+.navbar img{
+    width: 100%;
+    max-height: 60px;
+}
+.navbar i {
+    
+    margin-right: 7px;
+}
+.navbar-nav .nav-link {
+    color: rgb(27 36 49)!important;
+    padding: 10px;
+    border: 1px solid #000;
+    border-radius: 10px;
+}
+.navbar-nav .nav-link:hover {
+    background: #273142;
+    transition: 0.5s;
+    color: #fff!important;
+}
+.user-pofile-section{
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ffffff8c;
+}
+.user-image{
+    position:relative;
+    width:120px;
+    padding: 15px;
+    margin: 0 auto;
+}
+.user-content {
+    margin: 0 auto;
+    color: #fff;
+    text-align: center;
+margin-bottom: 10px;
+}
+.sidebar {
+    background-color: #273142;
+    box-shadow: none;
+    position:absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.sidebar-sticky {
+    padding-top: 70px;
+}
+.sidebar .nav-link {
+    border-left: 5px solid transparent;
+    color: #738297;
+    padding: 0.5rem 0.75rem;
+    font-size:16px;
+}
+.sidebar i {
+    display: inline-block;
+    font-size: 1rem;
+    margin-right: 5px;
+    min-width: 20px;
+}
+.sidebar .nav-link:hover {
+    color: white;
+}
+
+.sidebar .nav-link.active {
+    border-left: 5px solid #738297;
+    color: white;
+}
+
+.sidebar .zmdi {
+    display: inline-block;
+    font-size: 1.35rem;
+    margin-right: 5px;
+    min-width: 25px;
+}
+
+.card-list {
+    width: 100%;
+}
+
+.card-list:before,
+.card-list:after {
+    content: " ";
+    display: table;
+}
+
+.card-list:after {
+    clear: both;
+}
+
+.card {
+    border-radius: 8px;
+    color: white;
+    padding: 10px;
+    position: relative;
+}
+
+.card .zmdi {
+    color: white;
+    font-size: 28px;
+    opacity: 0.3;
+    position: absolute;
+    right: 13px;
+    top: 13px;
+}
+
+.card .stat {
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 8px;
+    margin-top: 25px;
+    padding: 10px 10px 0;
+    text-transform: uppercase;
+}
+
+.card .title {
+    display: inline-block;
+    font-size: 8px;
+    padding: 10px 10px 0;
+    text-transform: uppercase;
+}
+
+.card .value {
+    font-size: 28px;
+    padding: 0 10px;
+}
+
+.card.blue {
+    background-color: #2298F1;
+}
+
+.card.green {
+    background-color: #66B92E;
+}
+
+.card.orange {
+    background-color: #DA932C;
+}
+
+.card.red {
+    background-color: #D65B4A;
+}
+
+.projects {
+    background-color: #273142;
+    border: 1px solid #313D4F;
+    overflow-x: auto;
+    width: 100%;
+}
+
+.projects-inner {
+    border-radius: 4px;
+}
+
+.projects-header {
+    color: white;
+    padding: 22px;
+}
+
+.projects-header .count,
+.projects-header .title {
+    display: inline-block;
+}
+
+.projects-header .count {
+    color: #738297;
+}
+
+.projects-header .zmdi {
+    cursor: pointer;
+    float: right;
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.projects-header .title {
+    font-size: 21px;
+}
+
+.projects-header .title+.count {
+    margin-left: 5px;
+}
+
+.danger-item {
+    border-left: 4px solid #A84D43;
+}
+
+.zmdi {
+    line-height: 1;
+    vertical-align: middle;
+}
