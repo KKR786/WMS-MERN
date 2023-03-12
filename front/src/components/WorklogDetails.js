@@ -7,11 +7,36 @@ import UpdateWorklog from './UpdateWorklog';
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 
 const WorklogDetails = ({ worklogs, date }) => {
-  const { dispatch } = useWorklogsContext();
-  const { user } = useAuthContext();
   const [wId, setWId] = React.useState(null);
   const [edit, setEdit] = React.useState(false);
+  const [details,setDetails] = React.useState(false)
+  const [total, setTotal] = React.useState(0);
+  const { dispatch } = useWorklogsContext();
+  const { user } = useAuthContext();
+  
 
+  React.useEffect(() => {
+    // if (worklogs) {
+    //   const date = "2023-02-01";
+    //   const date2 = "2023-02-04";
+    //   const filteredWorklog = worklogs.filter((worklog) => {
+    //     const logDate = new Date(worklog.date);
+    //     return logDate >= new Date(date) && logDate <= new Date(date2);
+    //   });
+    //   const totalHour = filteredWorklog.reduce((total, worklog) => total + (worklog.time/60), 0);
+    //   console.log(totalHour);
+    // }
+    if (worklogs) {
+      const filteredWorklogs = worklogs.filter((worklog) => date === worklog.date);
+      const totalHours = filteredWorklogs.reduce((total, worklog) => total + (worklog.time/60), 0);
+      setTotal(totalHours);
+      if(filteredWorklogs.length>0) {
+        setDetails(true);
+      }else {
+        setDetails(false);
+      }
+    }
+  }, [worklogs, date]);
   
   const editBtn = React.useCallback((id) => {
     setWId(id);
@@ -46,8 +71,13 @@ const WorklogDetails = ({ worklogs, date }) => {
       edit && 
       <UpdateWorklog id={wId} state={setEdit}/>
     }
+    {details &&
       <div className="worklog-details">
-        <h4>{date}</h4>
+        <div className="d-flex justify-content-between">
+          <h4>{date}</h4>
+          <h4 className='text-primary'>Total Hour: <span className="text-success">{total.toFixed(2)}</span></h4>
+        </div>
+        
         <table>
           <thead className="bg-info text-white">
             <tr>
@@ -81,13 +111,13 @@ const WorklogDetails = ({ worklogs, date }) => {
                       <td>{worklog.type}</td>
                       <td>{(worklog.time / 60).toFixed(2)}</td>
                       <td>
-                        <span className="material-symbols-outlined editBtn"
+                        <span className="material-symbols-outlined btn editBtn"
                           onClick={()=>editBtn(worklog._id)}
                         >
                           edit
                         </span>
                         <span
-                          className="material-symbols-outlined deleteBtn"
+                          className="material-symbols-outlined btn deleteBtn"
                           onClick={()=>deleteOnClick(worklog._id)}
                         >
                           delete
@@ -100,6 +130,7 @@ const WorklogDetails = ({ worklogs, date }) => {
         </table>
         {/* <p>{formatDistanceToNow(new Date(worklog.createdAt), { addSuffix: true })}</p> */}
       </div>
+}
     </>
   );
 };

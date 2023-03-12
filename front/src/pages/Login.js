@@ -45,7 +45,7 @@ const Login = () => {
             required
           />
           <div className="submit" /*req ? "submit" : "required"*/>
-            <button hidden={!(email && password)} disabled={isLoading}>
+            <button className="loginBtn" hidden={!(email && password)} disabled={isLoading}>
               <span></span>
               <span></span>
               <span></span>

@@ -21,6 +21,27 @@ const perDayWorklogs = async (req, res) => {
   }
   res.status(200).json(dayLogs);
 }
+//get per month worklogs
+const perMonthWorklogs = async (req, res) => {
+  const { month, year } = req.body;
+  
+  const startDate = new Date(year, month - 1, 1);
+  const endDate = new Date(year, month, 0);
+  const dates = [];
+  for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+    dates.push(new Date(date));
+  }
+
+  const monthLogs = await Worklog.find({ 
+    date: { $in: dates } 
+  });
+
+  if (!monthLogs || monthLogs.length === 0) {
+    return res.json({message: 'No worklogs found'})
+  }
+
+  res.status(200).json(monthLogs);
+}
 
 // get a single Worklog
 const getWorklog = async (req, res) => {
@@ -103,13 +124,13 @@ const updateWorklog = async (req, res) => {
     return res.status(404).json({error: 'No such Worklog'})
   }
 
-  const updatedWorklog = await Worklog.findOneAndUpdate({_id: id}, { ...req.body }, {returnNewDocument: true});
+  const updatedWorklog = await Worklog.findOneAndUpdate({_id: id}, { ...req.body }, { new: true });
 
   if (!updatedWorklog) {
     return res.status(400).json({error: 'No such Worklog'})
   }
   else {
-    return res.status(200).json({updatedWorklog})
+    return res.status(200).json(updatedWorklog)
   }
 }
 

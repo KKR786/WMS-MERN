@@ -54,14 +54,14 @@ const NewAccount = () => {
           onChange = {(e) => setRole(e.value)}
           className="select-role"
         />
-      <label>Password:</label>
+      <label className="mt-3">Password:</label>
       <input 
         type="password" 
         onChange={(e) => setPassword(e.target.value)} 
         value={password} 
       />
         <div className="addAccount">
-            <button disabled={isLoading} className="addAccountBtn">ADD</button>
+            <button disabled={isLoading} className="addAccountBtn">Create</button>
         </div>
       {error && <div className="error">{error}</div>}
       

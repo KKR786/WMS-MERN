@@ -5,9 +5,9 @@ import { useAuthContext } from "../hooks/useAuthContext"
 // components
 import WorklogDetails from '../components/WorklogDetails' 
 
-export default function VeiwWorklog() {
+export default function ViewWorklog() {
 
-    const {worklogs, dispatch} = useWorklogsContext()
+  const {worklogs, dispatch} = useWorklogsContext()
   const {user} = useAuthContext()
 
   useEffect(() => {

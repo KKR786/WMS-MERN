@@ -1,4 +1,5 @@
-import { createContext, useReducer, useEffect } from 'react'
+import { createContext, useReducer, useEffect, useState } from 'react';
+import gif from "./../assets/loading.gif";
 
 export const AuthContext = createContext()
 
@@ -17,6 +18,7 @@ export const AuthContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, { 
     user: null
   })
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'))
@@ -24,14 +26,20 @@ export const AuthContextProvider = ({ children }) => {
     if (user) {
       dispatch({ type: 'LOGIN', payload: user }) 
     }
+
+    setLoading(false);
   }, [])
 
   console.log('AuthContext state:', state)
   
-  return (
-    <AuthContext.Provider value={{ ...state, dispatch }}>
-      { children }
-    </AuthContext.Provider>
+  return loading ? (
+    <div className='loading'>
+      <img src={gif} alt="Loading..."/>
+    </div>
+    ) : (
+      <AuthContext.Provider value={{ ...state, dispatch }}>
+        { children }
+      </AuthContext.Provider>
   )
 
 }

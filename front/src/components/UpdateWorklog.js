@@ -4,9 +4,6 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import Select from "react-select";
 
 export default function UpdateWorklog(props) {
-  const { worklog, dispatch } = useWorklogsContext();
-  const { user } = useAuthContext();
-
   const [ticketId, setTicketId] = useState("");
   const [domain, setDomain] = useState("");
   const [agency, setAgency] = useState("");
@@ -14,6 +11,12 @@ export default function UpdateWorklog(props) {
   const [type, setType] = useState("");
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
+  const { worklog, dispatch } = useWorklogsContext();
+  const { user } = useAuthContext();
+
 
   React.useEffect(()=>{
     if(worklog) {
@@ -31,6 +34,26 @@ export default function UpdateWorklog(props) {
     { value: "CSM", label: "CSM" },
     { value: "CSMBD", label: "CSMBD" },
   ];
+
+  function handleMouseDown(event) {
+    setIsDragging(true);
+    setPosition({
+      x: event.clientX - event.target.offsetLeft,
+      y: event.clientY - event.target.offsetTop
+    });
+  }
+
+  function handleMouseMove(event) {
+    if (isDragging) {
+      const x = event.clientX - position.x;
+      const y = event.clientY - position.y;
+      setPosition({ x, y });
+    }
+  }
+
+  function handleMouseUp() {
+    setIsDragging(false);
+  }
 
   React.useEffect(() => {
     const fetchWorklogs = async () => {
@@ -89,11 +112,12 @@ console.log(worklog)
     <>
     {worklog &&
     <div className="form-popup">
-      <form className="create" onSubmit={handleSubmit}>
+      <div className="popup-header" onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove}>
+        <span className="float-right top-0 cancel" onClick={()=>props.state(false)}>X</span>
         <h3>Update Worklog</h3>
-        <span onClick={()=>props.state(false)}>X</span>
-
-        <div className="entry">
+      </div>
+      <form className="update mt-5" onSubmit={handleSubmit}>
+        <div className="reEntry">
           <label>Ticket_Id:</label>
           <input
             type="number"
@@ -103,7 +127,7 @@ console.log(worklog)
           />
         </div>
 
-        <div className="entry">
+        <div className="reEntry">
           <label>Domain:</label>
           <input
             type="text"
@@ -113,7 +137,7 @@ console.log(worklog)
           />
         </div>
 
-        <div className="entry">
+        <div className="reEntry">
           <label>Agency:</label>
           <Select
             placeholder="Select Agency"
@@ -125,7 +149,7 @@ console.log(worklog)
           />
         </div>
 
-        <div className="entry">
+        <div className="reEntry">
           <label>Time (in min):</label>
           <input
             type="number"
@@ -135,7 +159,7 @@ console.log(worklog)
           />
         </div>
 
-        <div className="entry">
+        <div className="reEntry">
           <label>Work Type:</label>
           <input
             type="text"

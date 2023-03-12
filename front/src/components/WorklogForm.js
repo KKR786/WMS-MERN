@@ -1,5 +1,4 @@
 import { useState } from "react";
-import {Link} from "react-router-dom"
 import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
 import Select from 'react-select';
@@ -26,7 +25,11 @@ const WorklogForm = (props) => {
     { value: 'CSMBD', label: 'CSMBD' }
   ]
   //console.log(date)
-  props.handle(date)
+  
+  const handleDateChange = (e) => {
+    setDate(e.target.value);
+    props.handle(e.target.value);
+  }
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,13 +69,14 @@ const WorklogForm = (props) => {
   };
 
   return (
-    <form className="create" onSubmit={handleSubmit}>
-      <h3>Entry Your Work</h3>
+    <>
+    <h3>Entry Your Work</h3>
+    <form className="create mt-4" onSubmit={handleSubmit}>
       <div className="entry">
         <label>Date:</label>
         <input
           type="date"
-          onChange={(e) => setDate(e.target.value)}
+          onChange={handleDateChange}
           value={date}
           className={emptyFields.includes("date") ? "error" : ""}
         />
@@ -129,10 +133,12 @@ const WorklogForm = (props) => {
           className={emptyFields.includes("type") ? "error" : ""}
         />
       </div>
-      <Link to="/veiw">Veiw </Link>
-      <button>Add</button>
-      {error && <div className="error">{error}</div>}
+      <div className="entry">
+        <button>Add</button>
+      </div>
+      {error && <div className="entry error">{error}</div>}
     </form>
+    </>
   );
 };
 
