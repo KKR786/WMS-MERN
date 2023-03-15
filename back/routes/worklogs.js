@@ -3,6 +3,7 @@ const {
   createWorklog,
   getWorklogs,
   getWorklog,
+  perMonthWorklogs,
   perDayWorklogs,
   deleteWorklog,
   updateWorklog
@@ -18,6 +19,8 @@ router.use(requireAuth)
 router.get('/', getWorklogs)
 
 router.get('/day', perDayWorklogs)
+
+router.get('/:user_id', perMonthWorklogs)
 
 //GET a single Worklog
 router.get('/:id', getWorklog)

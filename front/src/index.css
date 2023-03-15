@@ -246,6 +246,7 @@ form button {
   border-radius: 4px;
   cursor: pointer;
   position: relative;
+  display: block;
   color: white;
   font-size: 17px;
   overflow: hidden;
@@ -395,16 +396,6 @@ form.login {
   color: white;
 }
 
-h1,
-h3 {
-  text-align: center;
-}
-
-.submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 .addAccount {
   display: flex;
   align-items: center !important;
@@ -1744,12 +1735,6 @@ a {
   padding: 20px;
   box-sizing: border-box;
   transition: margin-left .35s ease-in-out,left .35s ease-in-out,margin-right .35s ease-in-out,right .35s ease-in-out;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
 }
 
 li {

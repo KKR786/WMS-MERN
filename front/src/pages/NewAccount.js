@@ -25,7 +25,7 @@ const NewAccount = () => {
   return (
     <div className="signup-box">
     <form className="signup" onSubmit={handleSubmit}>
-      <h3>Create New Account</h3>
+      <h3 className="text-center">Create New Account</h3>
       
       <label>Name:</label>
       <input 

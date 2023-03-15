@@ -70,7 +70,7 @@ const WorklogForm = (props) => {
 
   return (
     <>
-    <h3>Entry Your Work</h3>
+    <h3 className="text-center">Entry Your Work</h3>
     <form className="create mt-4" onSubmit={handleSubmit}>
       <div className="entry">
         <label>Date:</label>

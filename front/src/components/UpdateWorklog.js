@@ -114,7 +114,7 @@ console.log(worklog)
     <div className="form-popup">
       <div className="popup-header" onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove}>
         <span className="float-right top-0 cancel" onClick={()=>props.state(false)}>X</span>
-        <h3>Update Worklog</h3>
+        <h3 className="text-center">Update Worklog</h3>
       </div>
       <form className="update mt-5" onSubmit={handleSubmit}>
         <div className="reEntry">

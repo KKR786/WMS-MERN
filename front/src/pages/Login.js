@@ -28,7 +28,7 @@ const Login = () => {
       <div id="stars4"></div>
 
       <div className="login-box">
-      <h1>Sign In</h1>
+      <h1 className="text-center">Sign In</h1>
         <form className="login" onSubmit={handleSubmit}>
           <label>Email address:</label>
           <input

@@ -23,25 +23,23 @@ const perDayWorklogs = async (req, res) => {
 }
 //get per month worklogs
 const perMonthWorklogs = async (req, res) => {
-  const { month, year } = req.body;
-  
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0);
-  const dates = [];
-  for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
-    dates.push(new Date(date));
-  }
+  const { user_id } = req.params;
+  const { month, year } = req.query;
+
+  const startDate = new Date(year, month - 1, 1).toISOString().substr(0, 10);
+  const endDate = new Date(year, month, 1, 0, 0, -1).toISOString().substr(0, 10);
 
   const monthLogs = await Worklog.find({ 
-    date: { $in: dates } 
+    user_id: user_id,
+    date: { $gte: startDate, $lte: endDate } 
   });
 
   if (!monthLogs || monthLogs.length === 0) {
-    return res.json({message: 'No worklogs found'})
+    return res.json({ error: 'No such Worklog' });
   }
 
   res.status(200).json(monthLogs);
-}
+};
 
 // get a single Worklog
 const getWorklog = async (req, res) => {
@@ -138,6 +136,7 @@ const updateWorklog = async (req, res) => {
 module.exports = {
   getWorklogs,
   getWorklog,
+  perMonthWorklogs,
   perDayWorklogs,
   createWorklog,
   deleteWorklog,

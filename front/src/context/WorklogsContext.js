@@ -14,6 +14,11 @@ export const worklogsReducer = (state, action) => {
           ...state, // Preserve the existing worklogs state
           worklog: action.payload
         }
+    case 'GET_MONTHLY_WORKLOGS':
+      return {
+        ...state,
+        monthlyWorklogs: action.payload
+      }
     case 'CREATE_WORKLOG':
       return {
         worklogs: [action.payload, ...state.worklogs],
@@ -37,7 +42,8 @@ export const worklogsReducer = (state, action) => {
 export const WorklogsContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(worklogsReducer, {
     worklogs: null,
-    worklog: null
+    worklog: null,
+    monthlyWorklogs: null
   })
 
   return (

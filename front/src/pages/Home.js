@@ -1,17 +1,29 @@
 import React from "react";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { useAuthContext } from "../hooks/useAuthContext";
+import { useWorklogsContext } from "../hooks/useWorklogsContext";
 
 export default function Home() {
+  const { user } = useAuthContext();
+  const { monthlyWorklogs, dispatch } = useWorklogsContext();
+  const [ total, setTotal ] = React.useState(0);
+  const [ csm, setCsm ] = React.useState(0);
+  const [ abit, setAbit ] = React.useState(0);
+  
   let date = new Date()
   const [selectedDate, setSelectedDate] = React.useState(date);
   const monthNames = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
   ];
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  
+  
+
   const nationalHolidays = [
     { date: new Date(2023, 0, 1), name: "New Year's Day" },
     { date: new Date(2023, 3, 21), name: "National Sovereignty and Children's Day" },
@@ -22,6 +34,16 @@ export default function Home() {
     { date: new Date(2023, 9, 29), name: "Republic Day" },
   ];
 
+  let workDays = 0;
+  for (let i = 1; i <= daysInMonth; i++) {
+    const date = new Date(year, month, i);
+    const daysOfWeek = date.getDay();
+    const isHoliday = nationalHolidays.some(holiday => holiday.date.getTime() === date.getTime());
+    if (daysOfWeek !== 0 && daysOfWeek !== 6 && !isHoliday) {
+      workDays++;
+    }
+  }
+console.log(workDays)
   const tileClassName = ({ date, view }) => {
     if (view === 'month' && nationalHolidays.find((holiday) => holiday.date.getTime() === date.getTime())) {
       return 'holiday-tile';
@@ -40,6 +62,61 @@ export default function Home() {
     return null;
   };
 
+  React.useEffect(() => {
+    const fetchWorklogs = async () => {
+      const response = await fetch(`/api/worklogs/${user.id}?month=${selectedDate.getMonth()+1}&year=${date.getFullYear()}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const json = await response.json();
+
+      if (response.ok) {
+        dispatch({ type: "GET_MONTHLY_WORKLOGS", payload: json });
+        //setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchWorklogs();
+    }
+  }, [dispatch, user, selectedDate]);
+
+  console.log(monthlyWorklogs);
+
+  React.useEffect(() => {
+    if(monthlyWorklogs && monthlyWorklogs.length) {
+      const filterCSM = monthlyWorklogs.filter(
+        (worklog) => 'CSM' === worklog.agency
+      );
+      const csmHours = filterCSM.reduce(
+        (total, worklog) => total + worklog.time / 60,
+        0
+      );
+      const filterABIT = monthlyWorklogs.filter(
+        (worklog) => 'ABIT' === worklog.agency
+      );
+      const abitHours = filterABIT.reduce(
+        (total, worklog) => total + worklog.time / 60,
+        0
+      );
+      const totalHours = monthlyWorklogs.reduce(
+        (total, worklog) => total + worklog.time / 60,
+        0
+      );
+      setTotal(totalHours.toFixed(2));
+      setCsm(csmHours.toFixed(2));
+      setAbit(abitHours.toFixed(2));
+    } else {
+      setTotal(0);
+      setCsm(0);
+      setAbit(0);
+    }
+  }, [ monthlyWorklogs ]);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+  
+
   return (
     <div className="home">
       <h1 className="h3 mb-3"><strong>Analytics</strong> Dashboard</h1>
@@ -57,9 +134,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <h1>152</h1>
+              <h1>{total}</h1>
               <div className="text-center">
-                <span className="text-muted">{monthNames[date.getMonth()]}</span>
+                <span className="text-muted">{monthNames[selectedDate.getMonth()]}</span>
               </div>
             </div>
           </div>
@@ -77,9 +154,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <h1>152</h1>
+              <h1>{(total/workDays).toFixed(2)}</h1>
               <div className="text-center">
-                <span className="text-muted">{monthNames[date.getMonth()]}</span>
+                <span className="text-muted">{monthNames[selectedDate.getMonth()]}</span>
               </div>
             </div>
           </div>
@@ -97,9 +174,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <h1>152</h1>
+              <h1>{csm}</h1>
               <div className="text-center">
-                <span className="text-muted">{monthNames[date.getMonth()]}</span>
+                <span className="text-muted">{monthNames[selectedDate.getMonth()]}</span>
               </div>
             </div>
           </div>
@@ -117,9 +194,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <h1>152</h1>
+              <h1>{abit}</h1>
               <div className="text-center">
-                <span className="text-muted">{monthNames[date.getMonth()]}</span>
+                <span className="text-muted">{monthNames[selectedDate.getMonth()]}</span>
               </div>
             </div>
           </div>
