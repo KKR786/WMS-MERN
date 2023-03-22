@@ -49,11 +49,9 @@ const Worklog = () => {
       {loading ? (
         <p>loading..</p>
       ) : (
-        <div className="container">
-          <div className="home">
-            <div className="worklogs mb-5">
-              {<WorklogDetails worklogs={worklogs} date={date} />}
-            </div>
+        <div className="section">
+          <div className="container">
+            <WorklogDetails worklogs={worklogs} date={date} />
             <WorklogForm handle={getDate} />
           </div>
         </div>

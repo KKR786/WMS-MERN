@@ -1,8 +1,10 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
+const autoIncrement = require('mongoose-auto-increment')
 
 const Schema = mongoose.Schema
+autoIncrement.initialize(mongoose.connection);
 
 const userSchema = new Schema({
   email: {
@@ -21,9 +23,18 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true
+  },
+  _id: {
+    type: Number,
+    unique: true
   }
-})
+}, {id: false});
 
+userSchema.plugin(autoIncrement.plugin, {
+  model: 'User',
+  field: '_id',
+  startAt: 1
+});
 
 // Signin
 userSchema.statics.login = async function(email, password) {

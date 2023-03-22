@@ -80,11 +80,10 @@ const WorklogDetails = ({ worklogs, date }) => {
               <span className="text-success">{total.toFixed(2)}</span>
             </h4>
           </div>
-
           <table>
             <thead className="bg-info text-white">
               <tr>
-                <th>Ticket_Id</th>
+                <th>ID</th>
                 <th>Domain</th>
                 <th>Agency</th>
                 <th>Work_Type</th>

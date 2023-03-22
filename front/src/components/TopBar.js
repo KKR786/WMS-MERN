@@ -5,8 +5,8 @@ function TopBar() {
     <nav className="navbar navbar-expand navbar-light navbar-bg">
       <div className="container">
         <div>
-        <span className="material-symbols-outlined">
-          menu_open
+        <span className="material-symbols-outlined display-4">
+          menu
         </span>
         </div>
       </div>

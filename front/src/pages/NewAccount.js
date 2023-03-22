@@ -7,6 +7,7 @@ const NewAccount = () => {
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('')
   const [photo, setPhoto] = useState('')
+  const [maintainable, setMaintainable] = useState(false)
   const [password, setPassword] = useState('')
   const {signup, error, isLoading} = useSignup()
 
@@ -15,7 +16,7 @@ const NewAccount = () => {
     { value: 'Admin', label: 'Admin' },
     { value: 'Employee', label: 'Employee' }
   ]
-  console.log(role)
+  console.log(maintainable)
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -60,9 +61,17 @@ const NewAccount = () => {
         onChange={(e) => setPassword(e.target.value)} 
         value={password} 
       />
-        <div className="addAccount">
-            <button disabled={isLoading} className="addAccountBtn">Create</button>
+      <div className="row align-items-center">
+        <div className="col">
+          <label>Will Maintain Worklog ?</label>
         </div>
+        <div className="col-auto mt-1">
+          <input type="checkbox" onChange={(e) => setMaintainable(e.target.checked)} value={maintainable} />
+        </div>
+      </div>
+      <div className="addAccount">
+          <button disabled={isLoading} className="addAccountBtn">Create</button>
+      </div>
       {error && <div className="error">{error}</div>}
       
     </form>

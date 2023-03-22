@@ -5,6 +5,24 @@ const createToken = (_id) => {
   return jwt.sign({_id}, process.env.SECRET, { expiresIn: '30d' })
 }
 
+//getUsers
+const getUsers = async (req, res) => {
+  const users = await User.find()
+
+  res.status(200).json(users)
+}
+
+//specific User
+const getUser = async (req, res) => {
+  const id = req.query
+  const user = await User.findOne({_id: id})
+
+  if(!user) {
+    return res.status(404).json({message: 'User not found'})
+  }
+  res.status(200).json({user})
+}
+
 // login a user
 const loginUser = async (req, res) => {
   const {email, password} = req.body
@@ -40,4 +58,4 @@ const signupUser = async (req, res) => {
   }
 }
 
-module.exports = { signupUser, loginUser }
+module.exports = { signupUser, loginUser, getUsers, getUser }

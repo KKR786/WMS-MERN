@@ -11,6 +11,7 @@ import TopBar from "./components/TopBar";
 import Worklog from "./pages/Worklog";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
+import ManageUsers from "./pages/ManageUsers";
 
 
 function App() {
@@ -20,42 +21,40 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-      <div className="container">
-        <div className="row">
-          <div className="col-lg-3 d-lg-block d-none">
-            <Navbar />
+          <Navbar />
+          <div className="content">
+            <TopBar />
+            <Routes>
+            <Route
+                path="/"
+                element={user ? <Home /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/profile"
+                element={user ? <Profile /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/worklog"
+                element={user ? <Worklog /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/reports"
+                element={user ? (user.role === 'Super-Admin' ? <Reports /> : <Navigate to="/login" />) : <Navigate to="/login" />}
+              />
+              <Route
+                path="/users"
+                element={user ? (user.role === 'Super-Admin' ? <ManageUsers /> : <Navigate to="/login" />) : <Navigate to="/login" />}
+              />
+              <Route
+                path="/login"
+                element={!user ? <Login /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/signup"
+                element={ user ? (user.role === 'Super-Admin' ? <Signup /> : <Navigate to="/login" />) : <Navigate to="/login" />}
+              />
+            </Routes>
           </div>
-          <div className="col-lg-9 col-md-12">
-          <TopBar />
-          <Routes>
-          <Route
-              path="/"
-              element={user ? <Home /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/profile"
-              element={user ? <Profile /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/worklog"
-              element={user ? <Worklog /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/reports"
-              element={user ? (user.role === 'Super-Admin' ? <Reports /> : <Navigate to="/login" />) : <Navigate to="/login" />}
-            />
-            <Route
-              path="/login"
-              element={!user ? <Login /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/signup"
-              element={ user ? <Signup /> : <Navigate to="/login" />}
-            />
-          </Routes>
-          </div>
-        </div>
-      </div>
       </BrowserRouter>
     </div>
   );

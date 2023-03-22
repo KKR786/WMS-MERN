@@ -5,12 +5,13 @@ function Profile() {
     const { user } = useAuthContext();
 
   return (
-    <div className='profile'>
-
-        <h1>Profile</h1>
-        <h3>{user.name}</h3>
+    <div className='section'>
+      <div className='container'>
+        <div className='profile'>
+          <h1>{user.name}</h1>
+        </div>
         <p>{user.role}</p>
-      
+      </div>
     </div>
   )
 }

@@ -28,7 +28,7 @@ const worklogSchema = new Schema({
     required: true
   },
   user_id: {
-    type: String,
+    type: Number,
     required: true
   }
 }, { timestamps: true })

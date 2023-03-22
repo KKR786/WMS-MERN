@@ -69,7 +69,7 @@ const WorklogForm = (props) => {
   };
 
   return (
-    <>
+    <div>
     <h3 className="text-center">Entry Your Work</h3>
     <form className="create mt-4" onSubmit={handleSubmit}>
       <div className="entry">
@@ -138,7 +138,7 @@ const WorklogForm = (props) => {
       </div>
       {error && <div className="entry error">{error}</div>}
     </form>
-    </>
+    </div>
   );
 };
 

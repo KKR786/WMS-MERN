@@ -54,10 +54,10 @@ export default function UpdateWorklog(props) {
   function handleMouseUp() {
     setIsDragging(false);
   }
-
+console.log(props.id)
   React.useEffect(() => {
     const fetchWorklogs = async () => {
-      const response = await fetch(`/api/worklogs/${props.id}`, {
+      const response = await fetch(`/api/worklogs/unique/${props.id}`, {
         headers: {'Authorization': `Bearer ${user.token}`},
       })
       const json = await response.json()
@@ -71,7 +71,7 @@ export default function UpdateWorklog(props) {
     }
   }, [dispatch, props.id, user])
 
-console.log(worklog)
+  console.log(worklog)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -168,7 +168,7 @@ console.log(worklog)
             className={emptyFields.includes("type") ? "error" : ""}
           />
         </div>
-        <button>Update</button>
+        <button className="updateBtn">Update</button>
         {error && <div className="error">{error}</div>}
       </form>
     </div>

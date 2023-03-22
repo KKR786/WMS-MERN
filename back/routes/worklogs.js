@@ -1,6 +1,7 @@
 const express = require('express')
 const {
   createWorklog,
+  allWorklogs,
   getWorklogs,
   getWorklog,
   perMonthWorklogs,
@@ -15,6 +16,9 @@ const router = express.Router()
 // require auth for all Worklog routes
 router.use(requireAuth)
 
+//
+router.post('/reports', allWorklogs)
+
 // GET all Worklogs
 router.get('/', getWorklogs)
 
@@ -23,7 +27,7 @@ router.get('/day', perDayWorklogs)
 router.get('/:user_id', perMonthWorklogs)
 
 //GET a single Worklog
-router.get('/:id', getWorklog)
+router.get('/unique/:id', getWorklog)
 
 // POST a new Worklog
 router.post('/', createWorklog)

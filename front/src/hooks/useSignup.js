@@ -23,6 +23,7 @@ export const useSignup = () => {
     }
     if (response.ok) {
       alert("User Created Successfully");
+      window.location.reload();
       // // save the user to local storage
       // localStorage.setItem('user', JSON.stringify(json))
 

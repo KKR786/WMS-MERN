@@ -1,13 +1,33 @@
 const Worklog = require('../models/worklogModel')
 const mongoose = require('mongoose')
 
-// get all Worklogs
+//get all worklogs
+const allWorklogs = async (req, res) => {
+  const { startDate, endDate, domain, agency } = req.body;
+  let query = {};
+
+  if (domain) {
+    query.domain = domain;
+  }
+  if (agency) {
+    query.agency = agency;
+  }
+  query.date = { $gte: startDate, $lte: endDate };
+  const worklogs = await Worklog.find(query);
+
+  if (!worklogs || worklogs.length === 0) {
+    return res.status(404).json({ message: 'No worklogs found' });
+  }
+  res.status(200).json(worklogs);
+};
+
+// get all Worklogs of an user
 const getWorklogs = async (req, res) => {
   const user_id = req.user._id
 
-  const Worklogs = await Worklog.find({user_id}).sort({createdAt: -1})
+  const worklogs = await Worklog.find({user_id}).sort({createdAt: -1})
 
-  res.status(200).json(Worklogs)
+  res.status(200).json(worklogs)
 }
 
 //get per day worklogs
@@ -57,6 +77,9 @@ const getWorklog = async (req, res) => {
   res.status(200).json(worklog)
 }
 
+//domain base worklogs
+
+//
 
 // create new Worklog
 const createWorklog = async (req, res) => {
@@ -134,6 +157,7 @@ const updateWorklog = async (req, res) => {
 
 
 module.exports = {
+  allWorklogs,
   getWorklogs,
   getWorklog,
   perMonthWorklogs,
