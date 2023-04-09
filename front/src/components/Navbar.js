@@ -1,10 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 import { useLogout } from "../hooks/useLogout";
 import { useAuthContext } from "../hooks/useAuthContext";
 
-const Navbar = () => {
+const Navbar = (props) => {
   const { logout } = useLogout();
   const { user } = useAuthContext();
+  const location = useLocation();
+  const currentSlug = location.pathname;
+  const [activeLink, setActiveLink] = useState(currentSlug);
+
+  const handleLinkClick = (link) => {
+    setActiveLink(link);
+  };
 
   const handleClick = () => {
     logout();
@@ -13,7 +21,10 @@ const Navbar = () => {
   return (
     <>
       {user && (
-        <div className="sidebar">
+        <div
+          className="sidebar"
+          style={props.class ? { left: "0px" } : { left: "-250px" }}
+        >
           <nav className="navigation flex-column">
             <Link className="sidebar-brand" to="/">
               <span className="align-middle">WMS</span>
@@ -22,7 +33,12 @@ const Navbar = () => {
               <div className="force-overflow">
                 <ul className="nav flex-column flex-nowrap" id="ulmenu">
                   <li className="sidebar-header">Pages</li>
-                  <li className="nav-item">
+                  <li
+                    onClick={() => handleLinkClick("/")}
+                    className={
+                      activeLink === "/" ? "nav-item active" : "nav-item"
+                    }
+                  >
                     <Link className="nav-link" to="/">
                       <span className="material-symbols-outlined mr-2">
                         dashboard
@@ -30,7 +46,12 @@ const Navbar = () => {
                       Dashboard
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li
+                    onClick={() => handleLinkClick("/profile")}
+                    className={
+                      activeLink === "/profile" ? "nav-item active" : "nav-item"
+                    }
+                  >
                     <Link className="nav-link" to="/profile">
                       <span className="material-symbols-outlined mr-2">
                         account_circle
@@ -38,7 +59,12 @@ const Navbar = () => {
                       Profile
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li
+                    onClick={() => handleLinkClick("/worklog")}
+                    className={
+                      activeLink === "/worklog" ? "nav-item active" : "nav-item"
+                    }
+                  >
                     <Link className="nav-link" to="/worklog">
                       <span className="material-symbols-outlined mr-2">
                         edit_note
@@ -49,15 +75,14 @@ const Navbar = () => {
                   {user.role === "Super-Admin" && (
                     <>
                       <li className="sidebar-header">Super Admin Tools</li>
-                      <li className="nav-item">
-                        <Link className="nav-link" to="/signup">
-                          <span className="material-symbols-outlined mr-2">
-                            person_add
-                          </span>
-                          Create Account
-                        </Link>
-                      </li>
-                      <li className="nav-item">
+                      <li
+                        onClick={() => handleLinkClick("/reports")}
+                        className={
+                          activeLink === "/reports"
+                            ? "nav-item active"
+                            : "nav-item"
+                        }
+                      >
                         <Link className="nav-link" to="/reports">
                           <span className="material-symbols-outlined mr-2">
                             summarize
@@ -65,7 +90,40 @@ const Navbar = () => {
                           Reports
                         </Link>
                       </li>
-                      <li className="nav-item">
+                      <li
+                        onClick={() => handleLinkClick("/role-management")}
+                        className={
+                          activeLink === "/role-management" ? "nav-item active" : "nav-item"
+                        }
+                      >
+                        <Link className="nav-link" to="/role-management">
+                          <span className="material-symbols-outlined mr-2">
+                            settings_accessibility
+                          </span>
+                          Role Management
+                        </Link>
+                      </li>
+                      <li
+                        onClick={() => handleLinkClick("/system-settings")}
+                        className={
+                          activeLink === "/system-settings"
+                            ? "nav-item active"
+                            : "nav-item"
+                        }
+                      >
+                        <Link className="nav-link" to="/system-settings">
+                          <span className="material-symbols-outlined mr-2">
+                            settings_suggest
+                          </span>
+                          System Settings
+                        </Link>
+                      </li>
+                      <li
+                        onClick={() => handleLinkClick("/users")}
+                        className={
+                          activeLink === "/users" ? "nav-item active" : "nav-item"
+                        }
+                      >
                         <Link className="nav-link" to="/users">
                           <span className="material-symbols-outlined mr-2">
                             manage_accounts

@@ -1,7 +1,7 @@
 const Worklog = require('../models/worklogModel')
 const mongoose = require('mongoose')
 
-//get all worklogs
+//get all worklogs for report
 const allWorklogs = async (req, res) => {
   const { startDate, endDate, domain, agency } = req.body;
   let query = {};

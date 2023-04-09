@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthContext } from "./hooks/useAuthContext";
+import React from "react"
 
 // pages & components
 import Home from "./pages/Home";
@@ -12,18 +13,23 @@ import Worklog from "./pages/Worklog";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
 import ManageUsers from "./pages/ManageUsers";
+import SystemSettings from "./pages/SystemSettings";
+import ManageRoles from "./pages/ManageRoles";
 
 
 function App() {
   const { user } = useAuthContext();
+  const [navClass, setNavClass] = React.useState(true)
   console.log(user);
 
   return (
     <div className="App">
       <BrowserRouter>
-          <Navbar />
-          <div className="content">
-            <TopBar />
+          <Navbar class={navClass}/>
+          <div className="content" style={(navClass ? {marginLeft: '250px'} : {marginLeft: '0px'})}>
+            {user &&
+            <TopBar class={setNavClass}/>
+            }
             <Routes>
             <Route
                 path="/"
@@ -40,6 +46,14 @@ function App() {
               <Route
                 path="/reports"
                 element={user ? (user.role === 'Super-Admin' ? <Reports /> : <Navigate to="/login" />) : <Navigate to="/login" />}
+              />
+              <Route
+                path="/system-settings"
+                element={user ? (user.role === 'Super-Admin' ? <SystemSettings /> : <Navigate to="/login" />) : <Navigate to="/login" />}
+              />
+              <Route
+                path="/role-management"
+                element={user ? (user.role === 'Super-Admin' ? <ManageRoles /> : <Navigate to="/login" />) : <Navigate to="/login" />}
               />
               <Route
                 path="/users"

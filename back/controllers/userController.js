@@ -35,8 +35,14 @@ const loginUser = async (req, res) => {
     const name = user.name
     const role = user.role
     const id = user._id
+    const joined = new Date(user.createdAt.toString());
+    const joiningDate = joined.getFullYear() +
+    "-" +
+    joined.toLocaleString("en-US", { month: "2-digit" }) +
+    "-" +
+    joined.toLocaleString("en-US", { day: "2-digit" });
     
-    res.status(200).json({email, token, name, role, id})
+    res.status(200).json({email, token, name, role, id, joiningDate})
   } catch (error) {
     res.status(400).json({error: error.message})
   }

@@ -1,4 +1,5 @@
 const express = require('express')
+const { newDomain, getAllDomains } = require('../controllers/systemController')
 const {
   createWorklog,
   allWorklogs,
@@ -13,8 +14,11 @@ const requireAuth = require('../middleware/requireAuth')
 
 const router = express.Router()
 
-// require auth for all Worklog routes
+// middleware
 router.use(requireAuth)
+
+router.post('/system/domain', newDomain)
+router.get('/system/domains', getAllDomains)
 
 //
 router.post('/reports', allWorklogs)

@@ -116,12 +116,13 @@ console.log(props.id)
         <span className="float-right top-0 cancel" onClick={()=>props.state(false)}>X</span>
         <h3 className="text-center">Update Worklog</h3>
       </div>
-      <form className="update mt-5" onSubmit={handleSubmit}>
+      <form className="d-flex flex-wrap justify-content-between mt-5" onSubmit={handleSubmit}>
         <div className="reEntry">
           <label>Ticket_Id:</label>
           <input
             type="number"
             value={ticketId}
+            min="0"
             onChange={(e) => setTicketId(e.target.value)}
             className={emptyFields.includes("ticketId") ? "error" : ""}
           />
@@ -155,6 +156,7 @@ console.log(props.id)
             type="number"
             onChange={(e) => setTime(e.target.value)}
             value={time}
+            min="0"
             className={emptyFields.includes("time") ? "error" : ""}
           />
         </div>

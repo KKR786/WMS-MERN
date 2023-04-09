@@ -83,10 +83,10 @@ const WorklogDetails = ({ worklogs, date }) => {
           <table>
             <thead className="bg-info text-white">
               <tr>
-                <th>ID</th>
+                <th>Ticket ID</th>
                 <th>Domain</th>
                 <th>Agency</th>
-                <th>Work_Type</th>
+                <th>Work Type</th>
                 <th>Hours</th>
                 <th>Actions</th>
               </tr>

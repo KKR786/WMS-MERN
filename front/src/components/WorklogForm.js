@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
 import Select from 'react-select';
@@ -18,14 +18,30 @@ const WorklogForm = (props) => {
   const [type, setType] = useState("");
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
+  const [domains, setDomains] = useState([]);
+  const [agencies, setAgencies] = useState([]);
   
-  const options = [
-    { value: 'ABIT', label: 'ABIT' },
-    { value: 'CSM', label: 'CSM' },
-    { value: 'CSMBD', label: 'CSMBD' }
-  ]
-  //console.log(date)
-  
+  useEffect(() => {
+    const fetchDomains = async () => {
+      const res = await fetch("/api/worklogs/system/domains", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        console.log(json)
+        const domainList = json.map((data) => data.domain);
+        setDomains(domainList);
+        const agencyList = [...new Set(json.map((data) => data.agency))];
+        setAgencies(agencyList);
+      }
+    };
+
+    if (user) {
+      fetchDomains();
+    }
+  },[user])
+  console.log(domains, agencies)
   const handleDateChange = (e) => {
     setDate(e.target.value);
     props.handle(e.target.value);
@@ -69,9 +85,9 @@ const WorklogForm = (props) => {
   };
 
   return (
-    <div>
+    <div className="mt-4">
     <h3 className="text-center">Entry Your Work</h3>
-    <form className="create mt-4" onSubmit={handleSubmit}>
+    <form className="d-flex flex-wrap justify-content-between mt-4" onSubmit={handleSubmit}>
       <div className="entry">
         <label>Date:</label>
         <input
@@ -88,17 +104,20 @@ const WorklogForm = (props) => {
           type="number"
           onChange={(e) => setTicketId(e.target.value)}
           value={ticketId}
+          min="0"
           className={emptyFields.includes("ticketId") ? "error" : ""}
         />
       </div>
 
       <div className="entry">
         <label>Domain:</label>
-        <input
-          type="text"
-          onChange={(e) => setDomain(e.target.value)}
-          value={domain}
+        <Select 
+          placeholder = "Select Domain"
+          options = {domains.map((domain) => ({ value: domain, label: domain }))}
+          value={domains.find((obj) => obj.value === domain)}
+          onChange={(e) => setDomain(e.value)}
           className={emptyFields.includes("domain") ? "error" : ""}
+          id="domain"
         />
       </div>
 
@@ -106,8 +125,8 @@ const WorklogForm = (props) => {
         <label>Agency:</label>
         <Select 
           placeholder = "Select Agency"
-          options = {options}
-          value={options.find(obj => obj.value === agency)}
+          options = {agencies.map((agency) => ({ value: agency, label:agency }))}
+          value={agencies.find(obj => obj.value === agency)}
           onChange = {(e) => setAgency(e.value)} 
           className = {emptyFields.includes("agency") ? "error" : ""}
           id = "agency"
@@ -120,6 +139,7 @@ const WorklogForm = (props) => {
           type="number"
           onChange={(e) => setTime(e.target.value)}
           value={time}
+          min="0"
           className={emptyFields.includes("time") ? "error" : ""}
         />
       </div>

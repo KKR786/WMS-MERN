@@ -7,12 +7,14 @@ export const worklogsReducer = (state, action) => {
     case 'GET_WORKLOGS': 
       return {
         worklogs: action.payload,
-        worklog: null // Reset the worklog state
+        worklog: null, // Reset the worklog state
+        monthlyWorklogs: null
       }
       case 'GET_WORKLOG':
         return {
           ...state, // Preserve the existing worklogs state
-          worklog: action.payload
+          worklog: action.payload, // Reset the worklog state
+          monthlyWorklogs: null
         }
     case 'GET_MONTHLY_WORKLOGS':
       return {
@@ -22,17 +24,20 @@ export const worklogsReducer = (state, action) => {
     case 'CREATE_WORKLOG':
       return {
         worklogs: [action.payload, ...state.worklogs],
-        worklog: null // Reset the worklog state
+        worklog: null, // Reset the worklog state
+        monthlyWorklogs: null
       }
     case 'UPDATE_WORKLOG':
       return {
         worklogs: state.worklogs.map((w) => w._id === action.payload._id ? action.payload : w),
-        worklog: null // Reset the worklog state
+        worklog: null, // Reset the worklog state
+        monthlyWorklogs: null
       }  
     case 'DELETE_WORKLOG':
       return {
         worklogs: state.worklogs.filter((w) => w._id !== action.payload._id),
-        worklog: null // Reset the worklog state
+        worklog: null, // Reset the worklog state
+        monthlyWorklogs: null
       }
     default:
       return state

@@ -1,4 +1,5 @@
 const express = require('express')
+const { requireAuth } = require('../middleware/requireAuth')
 
 // controller functions
 const { loginUser, signupUser, getUsers, getUser } = require('../controllers/userController')

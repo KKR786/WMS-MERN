@@ -28,7 +28,7 @@ const userSchema = new Schema({
     type: Number,
     unique: true
   }
-}, {id: false});
+}, {id: false, timestamps: true});
 
 userSchema.plugin(autoIncrement.plugin, {
   model: 'User',

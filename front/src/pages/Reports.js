@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
@@ -6,10 +6,9 @@ import { useAuthContext } from "../hooks/useAuthContext";
 function Reports() {
   const { worklogs, dispatch } = useWorklogsContext();
   const { user } = useAuthContext();
-  // const [selectedMonth, setSelectedMonth] = useState({
-  //   value: new Date().getMonth(),
-  //   label: new Date().toLocaleString('default', { month: 'long' })
-  // });
+  const [total, setTotal] = useState(0);
+  const [error, setError] = useState(false);
+
   let newDate = new Date();
   const currentDate =
     newDate.getFullYear() +
@@ -32,13 +31,30 @@ function Reports() {
   const [agency, setAgency] = useState("");
   const [reports, setReports] = useState(false);
   const [names, setNames] = useState([{}]);
+  const [domains, setDomains] = useState([]);
+  const [agencies, setAgencies] = useState([]);
 
-  const options = [
-    {label: "--Select--"},
-    { value: "ABIT", label: "ABIT" },
-    { value: "CSM", label: "CSM" },
-    { value: "CSMBD", label: "CSMBD" },
-  ];
+
+  useEffect(() => {
+    const fetchDomains = async () => {
+      const res = await fetch("/api/worklogs/system/domains", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        console.log(json)
+        const domainList = json.map((data) => data.domain);
+        setDomains(domainList);
+        const agencyList = [...new Set(json.map((data) => data.agency))];
+        setAgencies(agencyList);
+      }
+    };
+
+    if (user) {
+      fetchDomains();
+    }
+  },[user])
 
   React.useEffect(() => {
     if (worklogs) {
@@ -61,7 +77,6 @@ function Reports() {
           }
         })
       ).then(() => {
-        // set the names state once with the accumulated users' data array
         setNames(usersData);
       });
     }
@@ -90,11 +105,20 @@ function Reports() {
         });
 
         const data = await response.json();
+        console.log(data);
         if (response.ok) {
           setReports(true);
           dispatch({ type: "GET_WORKLOGS", payload: data });
-        } else {
-          return response("No Data Found");
+          const totalHours = data.reduce(
+            (total, worklog) => total + worklog.time / 60,
+            0
+          );
+          setTotal(totalHours);
+          setError(false);
+        } else if (response.status === 404) {
+          setError(true);
+          setReports(true)
+          console.log('eror')
         }
         console.log(data);
       } catch (error) {
@@ -102,13 +126,13 @@ function Reports() {
       }
     }
   };
-  
+
   names.forEach((user) => console.log(user.name));
 
   return (
     <div className="section">
       <div className="container">
-        <h2 className="text-center">Reports</h2>
+        <h2 className="text-center mt-4">Reports</h2>
         <form className="report mt-5" onSubmit={handleSubmit}>
           <div className="report-item">
             <label>Start Date:</label>
@@ -117,8 +141,6 @@ function Reports() {
               onChange={(e) => setStartDate(e.target.value)}
               value={startDate}
             />
-            {/* <label>Select Month:</label>
-            <Select options={months} value={selectedMonth} onChange={handleChange} id="agency"/> */}
           </div>
           <div className="report-item">
             <label>End Date:</label>
@@ -130,20 +152,22 @@ function Reports() {
           </div>
           <div className="report-item">
             <label>Domain:</label>
-            <input
-              type="text"
-              onChange={(e) => setDomain(e.target.value)}
-              value={domain}
+            <Select 
+              placeholder = "Select Domain"
+              options = {[{ label: "--Select--" }, ...domains.map((domain) => ({ value: domain, label: domain }))]}
+              value={domains.find((obj) => obj.value === domain)}
+              onChange={(e) => setDomain(e.value)}
+              id="domain"
             />
           </div>
           <div className="report-item">
             <label>Agency:</label>
-            <Select
-              placeholder="Select Agency"
-              options={options}
-              value={options.find((obj) => obj.value === agency)}
-              onChange={(e) => setAgency(e.value)}
-              id="agency"
+            <Select 
+              placeholder = "Select Agency"
+              options = {[{ label: "--Select--" }, ...agencies.map((agency) => ({ value: agency, label:agency }))]}
+              value={agencies.find(obj => obj.value === agency)}
+              onChange = {(e) => setAgency(e.value)}
+              id = "agency"
             />
           </div>
           <div className="m-auto">
@@ -151,44 +175,61 @@ function Reports() {
           </div>
         </form>
         {reports && (
-          <div>
+          <div className="my-4">
+            <div>
+              <h5>
+                Total Hours:{" "} 
+               {total.toFixed(2)}
+              </h5>
+            </div>
             <table>
               <thead className="bg-info text-white">
                 <tr>
                   <th>Date</th>
-                  <th>ID</th>
+                  <th>Ticket ID</th>
                   <th>Domain</th>
                   <th>Agency</th>
-                  <th>Work_Type</th>
-                  <th>Hours</th>
+                  <th>Work Type</th>
+                  <th onClick={() => alert(`Total Hours: ${total.toFixed(2)}`)}>
+                    Hours
+                  </th>
                   <th>User</th>
                 </tr>
               </thead>
               <tbody>
-                {worklogs &&
-                  worklogs.map((worklog, i) => (
-                    <tr key={i} className="bg-light">
-                      <td>{worklog.date}</td>
-                      <td>
-                        <a
-                          href={"https://jupiterplatform.com/Tickets/edit.php?id=".concat(
-                            worklog.ticketId
-                          )}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {worklog.ticketId}
-                        </a>
-                      </td>
-                      <td>{worklog.domain}</td>
-                      <td>{worklog.agency}</td>
-                      <td>{worklog.type}</td>
-                      <td>{(worklog.time / 60).toFixed(2)}</td>
-                      <td>
-                        {names.find((data) => data.id === worklog.user_id)?.name || ''}
-                      </td>
-                    </tr>
-                  ))}
+                {!error ? (
+                  <>
+                    {worklogs &&
+                      worklogs.map((worklog, i) => (
+                        <tr key={i} className="bg-light">
+                          <td>{worklog.date}</td>
+                          <td>
+                            <a
+                              href={"https://jupiterplatform.com/Tickets/edit.php?id=".concat(
+                                worklog.ticketId
+                              )}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {worklog.ticketId}
+                            </a>
+                          </td>
+                          <td>{worklog.domain}</td>
+                          <td>{worklog.agency}</td>
+                          <td>{worklog.type}</td>
+                          <td>{(worklog.time / 60).toFixed(2)}</td>
+                          <td>
+                            {names.find((data) => data.id === worklog.user_id)
+                              ?.name || ""}
+                          </td>
+                        </tr>
+                      ))}
+                  </>
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="text-danger">No Data Found.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

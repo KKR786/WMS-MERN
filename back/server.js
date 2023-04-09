@@ -2,7 +2,7 @@ require('dotenv').config()
 const bodyParser = require('body-parser')
 const express = require('express')
 const mongoose = require('mongoose')
-const worklogRoutes = require('./routes/worklogs')
+const protectedRoutes = require('./routes/protected')
 const userRoutes = require('./routes/user')
 
 // express app
@@ -20,10 +20,10 @@ app.use((req, res, next) => {
 
 // routes
 app.use('/api/users', userRoutes)
-app.use('/api/worklogs', worklogRoutes)
+app.use('/api/worklogs', protectedRoutes)
 
 
-// connect to db
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     // listen for requests
