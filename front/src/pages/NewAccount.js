@@ -16,7 +16,7 @@ const NewAccount = () => {
     { value: 'Admin', label: 'Admin' },
     { value: 'Employee', label: 'Employee' }
   ]
-  console.log(maintainable)
+  
   const handleSubmit = async (e) => {
     e.preventDefault()
 

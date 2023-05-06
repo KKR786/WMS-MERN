@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLogout } from "../hooks/useLogout";
 import { useAuthContext } from "../hooks/useAuthContext";
 
@@ -8,7 +8,11 @@ const Navbar = (props) => {
   const { user } = useAuthContext();
   const location = useLocation();
   const currentSlug = location.pathname;
-  const [activeLink, setActiveLink] = useState(currentSlug);
+  const [activeLink, setActiveLink] = useState();
+
+  useEffect(() => {
+    setActiveLink(currentSlug);
+  }, [currentSlug])
 
   const handleLinkClick = (link) => {
     setActiveLink(link);
@@ -70,6 +74,19 @@ const Navbar = (props) => {
                         edit_note
                       </span>
                       Worklog
+                    </Link>
+                  </li>
+                  <li
+                    onClick={() => handleLinkClick("/leave-plan")}
+                    className={
+                      activeLink === "/leave-plan" ? "nav-item active" : "nav-item"
+                    }
+                  >
+                    <Link className="nav-link" to="/leave-plan">
+                      <span className="material-symbols-outlined mr-2">
+                        calendar_month
+                      </span>
+                      Leave Plan
                     </Link>
                   </li>
                   {user.role === "Super-Admin" && (

@@ -29,21 +29,22 @@ function Reports() {
   const [endDate, setEndDate] = useState(currentDate);
   const [domain, setDomain] = useState("");
   const [agency, setAgency] = useState("");
+  const [type, setType] = useState("");
   const [reports, setReports] = useState(false);
   const [names, setNames] = useState([{}]);
   const [domains, setDomains] = useState([]);
   const [agencies, setAgencies] = useState([]);
+  const [savedTypes, setSaveTypes] = useState([])
 
 
   useEffect(() => {
     const fetchDomains = async () => {
-      const res = await fetch("/api/worklogs/system/domains", {
+      const res = await fetch("/api/system/domains", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const json = await res.json();
 
       if (res.ok) {
-        console.log(json)
         const domainList = json.map((data) => data.domain);
         setDomains(domainList);
         const agencyList = [...new Set(json.map((data) => data.agency))];
@@ -56,11 +57,28 @@ function Reports() {
     }
   },[user])
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const fetchWorkTypes = async () => {
+        const res = await fetch('/api/system/work_types', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const json = await res.json();
+  
+        if (res.ok) {
+          const workTypes = json.map((data) => data.type);
+          setSaveTypes(workTypes)
+        }
+      };
+  
+      if (user) {
+        fetchWorkTypes();
+      }
+    }, [ user])
+
+  useEffect(() => {
     if (worklogs) {
       var usersId = [];
       worklogs.filter((worklog, i) => (usersId[i] = worklog.user_id));
-      console.log(usersId);
 
       const usersData = [];
 
@@ -71,7 +89,7 @@ function Reports() {
             headers: { Authorization: `Bearer ${user.token}` },
           });
           const json = await response.json();
-          console.log(typeof json.user._id);
+          
           if (response.ok) {
             usersData.push({ id: json.user._id, name: json.user.name });
           }
@@ -90,7 +108,7 @@ function Reports() {
       return;
     } else {
       try {
-        const response = await fetch("/api/worklogs/reports", {
+        const response = await fetch("/api/protected/reports", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -101,11 +119,12 @@ function Reports() {
             endDate,
             domain,
             agency,
+            type
           }),
         });
 
         const data = await response.json();
-        console.log(data);
+        
         if (response.ok) {
           setReports(true);
           dispatch({ type: "GET_WORKLOGS", payload: data });
@@ -118,9 +137,7 @@ function Reports() {
         } else if (response.status === 404) {
           setError(true);
           setReports(true)
-          console.log('eror')
         }
-        console.log(data);
       } catch (error) {
         console.error(error);
       }
@@ -168,6 +185,16 @@ function Reports() {
               value={agencies.find(obj => obj.value === agency)}
               onChange = {(e) => setAgency(e.value)}
               id = "agency"
+            />
+          </div>
+          <div className="report-item">
+            <label>Work Type:</label>
+            <Select 
+              placeholder = "Select Work Type"
+              options = {[{label: "--Select--" }, ...savedTypes.map((type) => ({ value: type, label: type }))]}
+              value={savedTypes.find(obj => obj.value === type)}
+              onChange = {(e) => setType(e.value)}
+              id = "type"
             />
           </div>
           <div className="m-auto">

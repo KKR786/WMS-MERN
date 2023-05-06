@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 
 //get all worklogs for report
 const allWorklogs = async (req, res) => {
-  const { startDate, endDate, domain, agency } = req.body;
+  const { startDate, endDate, domain, agency, type } = req.body;
   let query = {};
 
   if (domain) {
@@ -11,6 +11,9 @@ const allWorklogs = async (req, res) => {
   }
   if (agency) {
     query.agency = agency;
+  }
+  if(type) {
+    query.type = type;
   }
   query.date = { $gte: startDate, $lte: endDate };
   const worklogs = await Worklog.find(query);

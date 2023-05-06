@@ -7,9 +7,9 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/NewAccount";
 import Navbar from "./components/Navbar";
-import ViewWorklog from "./pages/ViewWorklog";
 import TopBar from "./components/TopBar";
 import Worklog from "./pages/Worklog";
+import LeavePlan from "./pages/LeavePlan";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
 import ManageUsers from "./pages/ManageUsers";
@@ -42,6 +42,10 @@ function App() {
               <Route
                 path="/worklog"
                 element={user ? <Worklog /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/leave-plan"
+                element={user ? <LeavePlan /> : <Navigate to="/login" />}
               />
               <Route
                 path="/reports"

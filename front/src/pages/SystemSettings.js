@@ -1,24 +1,104 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 
 function SystemSettings() {
-    const { user } = useAuthContext();
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
+  const { user } = useAuthContext();
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [domainForm, setDomainForm] = useState(false);
-  const [domain_id, setDomainId] = useState('')
-  const [domain, setDomain] = useState('')
-  const [agency, setAgency] = useState('')
+  const [domain_id, setDomainId] = useState("");
+  const [domain, setDomain] = useState("");
+  const [agency, setAgency] = useState("");
   const [workTypeForm, setWorkTypeForm] = useState(false);
-  const [workType, setWorkType] = useState('');
+  const [workType, setWorkType] = useState("");
+  const [savedTypes, setSaveTypes] = useState([])
   const [holidaysForm, setHolidaysForm] = useState(false);
-  const [dayTitle, setDayTitle] = useState('');
-  const [day, setDay] = useState('');
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [worklogMonth, setWorklogMonth] = useState(false);
+  const [month, setMonth] = useState("");
 
-  const workTypeSubmit = async() => {
+  const holidaySubmit = async (e) => {
+    e.preventDefault();
 
+    if(!user) {
+      setError("You must be logged in");
+      return;
+    }
+
+    const holiday = { date, title }
+
+    const res = await fetch('/api/protected/system/holiday', { 
+        method: 'POST',
+        body: JSON.stringify(holiday),
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`
+        }
+    });
+    const json = await res.json();
+    if (!res.ok) {
+        setError(json.error);
+        setSuccess('')
+      }
+      if (res.ok) {
+        setDate("");
+        setTitle('')
+        setSuccess("Holiday added successfully!");
+        setError('')
+      }
   }
-  const domainFormSubmit = async(e) => {
+  
+  const workTypeSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!user) {
+      setError("You must be logged in");
+      return;
+    }
+    const type = workType
+  
+    const res = await fetch("/api/protected/system/work_type", {
+        method: "POST",
+        body: JSON.stringify({type}),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+  
+      const json = await res.json();
+      
+      if (!res.ok) {
+        setError(json.error);
+        setSuccess('')
+      }
+      if (res.ok) {
+        setWorkType("");
+        setSuccess("Work Type added successfully!");
+        setError('')
+      }
+  };
+
+  useEffect(() => {
+    const fetchWorkTypes = async () => {
+        const res = await fetch('/api/system/work_types', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const json = await res.json();
+  
+        if (res.ok) {
+          const workTypes = json.map((data) => data.type);
+          setSaveTypes(workTypes)
+        }
+      };
+  
+      if (user) {
+        fetchWorkTypes();
+      }
+    }, [ user])
+    
+  const domainFormSubmit = async (e) => {
     e.preventDefault();
 
     if (!user) {
@@ -26,88 +106,133 @@ function SystemSettings() {
       return;
     }
 
-    const domainList = { domain_id, domain, agency }
-    const res = await fetch('/api/worklogs/system/domain', {
-        method: 'POST',
-        body: JSON.stringify(domainList),
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${user.token}`
-        }
+    const domainList = { domain_id, domain, agency };
+    const res = await fetch("/api/protected/system/domain", {
+      method: "POST",
+      body: JSON.stringify(domainList),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
     });
 
     const json = await res.json();
-    console.log(json)
-    if(!res.ok) {
-        setError(json.error);
+    
+    if (!res.ok) {
+      setError(json.error);
     }
-    if(res.ok) {
-        setDomainId('')
-        setAgency('')
-        setDomain('')
-        setSuccess('Domain added successfully!')
-        console.log("Domain added successfully!");
+    if (res.ok) {
+      setDomainId("");
+      setAgency("");
+      setDomain("");
+      setSuccess("Domain added successfully!");
     }
-  }
+  };
   return (
     <div className="section">
       <div className="container">
         <h1 className="text-center my-5">System Settings</h1>
         <ul className="list-group text-center">
-        <li className="list-group-item list-group-item-success" onClick={() => {setDomainForm(true); setWorkTypeForm(false); setHolidaysForm(false)}}>
+          <li
+            className="list-group-item list-group-item-success"
+            onClick={() => {
+              setDomainForm(true);
+              setWorkTypeForm(false);
+              setHolidaysForm(false);
+              setWorklogMonth(false);
+            }}
+          >
             Add New Domain
-        </li>
+          </li>
 
-          <li className="list-group-item list-group-item-info" onClick={() => {setWorkTypeForm(true); setDomainForm(false); setHolidaysForm(false)}}>
+          <li
+            className="list-group-item list-group-item-info"
+            onClick={() => {
+              setWorkTypeForm(true);
+              setDomainForm(false);
+              setHolidaysForm(false);
+              setWorklogMonth(false);
+            }}
+          >
             Catagorized Work Type
-        </li>
+          </li>
 
-          <li className="list-group-item list-group-item-danger"
-          onClick={() => {setHolidaysForm(true); setWorkTypeForm(false); setDomainForm(false)}}
-          >Set Holidays</li>
+          <li
+            className="list-group-item list-group-item-danger"
+            onClick={() => {
+              setHolidaysForm(true);
+              setWorkTypeForm(false);
+              setDomainForm(false);
+              setWorklogMonth(false);
+            }}
+          >
+            Set Holidays
+          </li>
 
-          <li className="list-group-item list-group-item-danger"
-          onClick={() => {setHolidaysForm(true); setWorkTypeForm(false); setDomainForm(false)}}
-          >Select Worklog Month</li>
+          <li
+            className="list-group-item list-group-item-warning"
+            onClick={() => {
+              setWorklogMonth(true);
+              setHolidaysForm(false);
+              setWorkTypeForm(false);
+              setDomainForm(false);
+            }}
+          >
+            Select Worklog Month
+          </li>
         </ul>
 
         {holidaysForm && (
           <div className="form-popup m-auto">
-            <span className="float-right top-0 cancel" onClick={() => setHolidaysForm(false)}>X</span>
-            <form className="d-flex flex-wrap justify-content-between mt-5" onSubmit={workTypeSubmit}>
-            <div className="">
+            <span
+              className="float-right top-0 cancel"
+              onClick={() => setHolidaysForm(false)}
+            >
+              X
+            </span>
+            <h3 className="text-center">Set Holidays</h3>
+            <form
+              className="d-flex flex-wrap justify-content-between mt-5"
+              onSubmit={holidaySubmit}
+            >
+              <div className="holidays-input">
                 <label>Date:</label>
                 <input
                   type="date"
-                  onChange={(e) => setDay(e.target.value)}
-                  value={day}
+                  onChange={(e) => setDate(e.target.value)}
+                  value={date}
                 />
               </div>
-              <div className="">
+              <div className="holidays-input">
                 <label>Title:</label>
                 <input
                   type="text"
-                  onChange={(e) => setDayTitle(e.target.value)}
-                  value={dayTitle}
+                  onChange={(e) => setTitle(e.target.value)}
+                  value={title}
                 />
               </div>
               <div className="d-flex align-items-center">
-                <button className="updateBtn">ADD</button>
+                <button className="updateBtn mt-3">ADD</button>
               </div>
-              {/* {error && <div className="error">{error}</div>} */}
+              {error && <div className="error">{error}</div>}
+              {success && <div className="success">{success}</div>}
             </form>
-            <div className="mt-4">
-                <h5>Work Types:</h5>
-                <ul>
-                    <li></li>
-                </ul>
-            </div>
           </div>
         )}
+
         {workTypeForm && (
           <div className="form-popup m-auto">
-            <span className="float-right top-0 cancel" onClick={() => setWorkTypeForm(false)}>X</span>
-            <form className="d-flex flex-wrap justify-content-between mt-5" onSubmit={workTypeSubmit}>
+            <span
+              className="float-right top-0 cancel"
+              onClick={() => setWorkTypeForm(false)}
+            >
+              X
+            </span>
+            <h3 className="text-center">Add Work Type</h3>
+            <form
+              className="d-flex flex-wrap justify-content-between mt-5"
+              onSubmit={workTypeSubmit}
+            >
               <div className="agency-input">
                 <label>New Type:</label>
                 <input
@@ -119,27 +244,42 @@ function SystemSettings() {
               <div className="d-flex align-items-center">
                 <button className="updateBtn">ADD</button>
               </div>
-              {/* {error && <div className="error">{error}</div>} */}
+              {error && <div className="error">{error}</div>}
             </form>
+            {success && <div className="success">{success}</div>}
             <div className="mt-4">
-                <h5>Work Types:</h5>
+              <h5>Work Types:</h5>  
+              {savedTypes &&
                 <ul>
-                    <li></li>
+                    {savedTypes.map((workType, i) =>
+                        <li key={i}>{workType}</li>
+                    )}
                 </ul>
+                }
             </div>
           </div>
         )}
+
         {domainForm && (
           <div className="form-popup m-auto">
-            <span className="float-right top-0 cancel" onClick={() => setDomainForm(false)}>X</span>
-            <form className="d-flex flex-wrap justify-content-between mt-5" onSubmit={domainFormSubmit}>
+            <span
+              className="float-right top-0 cancel"
+              onClick={() => setDomainForm(false)}
+            >
+              X
+            </span>
+            <h3 className="text-center">Add New Domain</h3>
+            <form
+              className="d-flex flex-wrap justify-content-between mt-5"
+              onSubmit={domainFormSubmit}
+            >
               <div className="domain-input">
                 <label>Domain ID:</label>
                 <input
                   type="number"
                   onChange={(e) => setDomainId(e.target.value)}
-                    value={domain_id}
-                    min="0"
+                  value={domain_id}
+                  min="0"
                 />
               </div>
               <div className="domain-input">
@@ -165,7 +305,6 @@ function SystemSettings() {
             {success && <div className="success">{success}</div>}
           </div>
         )}
-        
       </div>
     </div>
   );

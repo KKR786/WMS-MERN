@@ -4,7 +4,6 @@ import { useAuthContext } from "../hooks/useAuthContext";
 
 function ManageUsers() {
   const { user, users, dispatch } = useAuthContext()
-  const [ domainForm, setDomainForm ] = useState(false)
 
   React.useEffect(() => {
     const fetchUsers = async () => {
@@ -22,7 +21,7 @@ function ManageUsers() {
       fetchUsers();
     }
   }, [ user]);
-  console.log(users)
+  
   return (
     <div className="section">
       <div className="container">

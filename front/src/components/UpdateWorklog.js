@@ -11,6 +11,8 @@ export default function UpdateWorklog(props) {
   const [type, setType] = useState("");
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
+  const [domains, setDomains] = useState([]);
+  const [agencies, setAgencies] = useState([]);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
@@ -29,11 +31,26 @@ export default function UpdateWorklog(props) {
   },[worklog])
   
     
-  const options = [
-    { value: "ABIT", label: "ABIT" },
-    { value: "CSM", label: "CSM" },
-    { value: "CSMBD", label: "CSMBD" },
-  ];
+  React.useEffect(() => {
+    const fetchDomains = async () => {
+      const res = await fetch("/api/system/domains", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        console.log(json)
+        const domainList = json.map((data) => data.domain);
+        setDomains(domainList);
+        const agencyList = [...new Set(json.map((data) => data.agency))];
+        setAgencies(agencyList);
+      }
+    };
+
+    if (user) {
+      fetchDomains();
+    }
+  },[user])
 
   function handleMouseDown(event) {
     setIsDragging(true);
@@ -129,26 +146,28 @@ console.log(props.id)
         </div>
 
         <div className="reEntry">
-          <label>Domain:</label>
-          <input
-            type="text"
-            onChange={(e) => setDomain(e.target.value)}
-            value={domain}
-            className={emptyFields.includes("domain") ? "error" : ""}
-          />
-        </div>
+        <label>Domain:</label>
+        <Select 
+          placeholder = "Select Domain"
+          options = {domains.map((domain) => ({ value: domain, label: domain }))}
+          value={domains.find((obj) => obj.value === domain)}
+          onChange={(e) => setDomain(e.value)}
+          className={emptyFields.includes("domain") ? "error" : ""}
+          id="domain"
+        />
+      </div>
 
-        <div className="reEntry">
-          <label>Agency:</label>
-          <Select
-            placeholder="Select Agency"
-            options={options}
-            value={options.find(obj => obj.value === agency)}
-            onChange={(e) => setAgency(e.value)}
-            className={emptyFields.includes("agency") ? "error" : ""}
-            id="agency"
-          />
-        </div>
+      <div className="reEntry">
+        <label>Agency:</label>
+        <Select 
+          placeholder = "Select Agency"
+          options = {agencies.map((agency) => ({ value: agency, label:agency }))}
+          value={agencies.find(obj => obj.value === agency)}
+          onChange = {(e) => setAgency(e.value)} 
+          className = {emptyFields.includes("agency") ? "error" : ""}
+          id = "agency"
+        />
+      </div>
 
         <div className="reEntry">
           <label>Time (in min):</label>

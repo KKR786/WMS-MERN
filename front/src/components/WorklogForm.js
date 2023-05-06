@@ -10,6 +10,19 @@ const WorklogForm = (props) => {
   let newDate = new Date()
   const currentDate = newDate.getFullYear()+'-'+newDate.toLocaleString("en-US", { month : '2-digit'})+'-'+newDate.toLocaleString("en-US", { day : '2-digit'})
 
+  const currentMonthFirstDate = new Date(
+    newDate.getFullYear(),
+    newDate.getMonth(),
+    1
+  );
+    const nextMonthFirstDate = new Date(
+      newDate.getFullYear(),
+      newDate.getMonth() + 1,
+      1
+    )
+  const startDate = currentMonthFirstDate.toLocaleDateString("en-CA")
+  const maxDate = nextMonthFirstDate.toLocaleDateString('en-CA')
+
   const [date, setDate] = useState(currentDate);
   const [ticketId, setTicketId] = useState("");
   const [domain, setDomain] = useState("");
@@ -20,10 +33,11 @@ const WorklogForm = (props) => {
   const [emptyFields, setEmptyFields] = useState([]);
   const [domains, setDomains] = useState([]);
   const [agencies, setAgencies] = useState([]);
+  const [savedTypes, setSaveTypes] = useState([])
   
   useEffect(() => {
     const fetchDomains = async () => {
-      const res = await fetch("/api/worklogs/system/domains", {
+      const res = await fetch("/api/system/domains", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const json = await res.json();
@@ -42,6 +56,24 @@ const WorklogForm = (props) => {
     }
   },[user])
   console.log(domains, agencies)
+  useEffect(() => {
+    const fetchWorkTypes = async () => {
+        const res = await fetch('/api/system/work_types', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const json = await res.json();
+  
+        if (res.ok) {
+          const workTypes = json.map((data) => data.type);
+          setSaveTypes(workTypes)
+        }
+      };
+  
+      if (user) {
+        fetchWorkTypes();
+      }
+    }, [ user])
+
   const handleDateChange = (e) => {
     setDate(e.target.value);
     props.handle(e.target.value);
@@ -92,6 +124,8 @@ const WorklogForm = (props) => {
         <label>Date:</label>
         <input
           type="date"
+          min={startDate}
+          max={maxDate}
           onChange={handleDateChange}
           value={date}
           className={emptyFields.includes("date") ? "error" : ""}
@@ -146,11 +180,13 @@ const WorklogForm = (props) => {
 
       <div className="entry">
         <label>Work Type:</label>
-        <input
-          type="text"
-          onChange={(e) => setType(e.target.value)}
-          value={type}
-          className={emptyFields.includes("type") ? "error" : ""}
+        <Select 
+          placeholder = "Select Work Type"
+          options = {savedTypes.map((type) => ({ value: type, label: type }))}
+          value={savedTypes.find(obj => obj.value === type)}
+          onChange = {(e) => setType(e.value)} 
+          className = {emptyFields.includes("type") ? "error" : ""}
+          id = "type"
         />
       </div>
       <div className="entry">

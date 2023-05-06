@@ -2,6 +2,7 @@ require('dotenv').config()
 const bodyParser = require('body-parser')
 const express = require('express')
 const mongoose = require('mongoose')
+const publicRoutes = require('./routes/public')
 const protectedRoutes = require('./routes/protected')
 const userRoutes = require('./routes/user')
 
@@ -20,7 +21,8 @@ app.use((req, res, next) => {
 
 // routes
 app.use('/api/users', userRoutes)
-app.use('/api/worklogs', protectedRoutes)
+app.use('/api', publicRoutes)
+app.use('/api/protected', protectedRoutes)
 
 
 

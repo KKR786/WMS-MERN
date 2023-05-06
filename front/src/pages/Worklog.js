@@ -23,7 +23,6 @@ const Worklog = () => {
     setDate(val);
   }
 
-  console.log(worklogs);
   useEffect(() => {
     const fetchWorklogs = async () => {
       const response = await fetch("/api/worklogs", {
@@ -41,8 +40,6 @@ const Worklog = () => {
       fetchWorklogs();
     }
   }, [dispatch, user]);
-
-  console.log(date);
 
   return (
     <>
