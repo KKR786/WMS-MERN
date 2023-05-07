@@ -285,7 +285,10 @@ body {
 .holiday-tile {
   color: red;
 }
-
+.leaveDay-tile {
+  color: white;
+  background-color: black!important;
+}
 .holiday-tooltip {
   position: absolute;
   visibility: hidden;

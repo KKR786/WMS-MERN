@@ -44,6 +44,7 @@ const perDayWorklogs = async (req, res) => {
   }
   res.status(200).json(dayLogs);
 }
+
 //get per month worklogs
 const perMonthWorklogs = async (req, res) => {
   const { user_id } = req.params;
@@ -79,10 +80,6 @@ const getWorklog = async (req, res) => {
   
   res.status(200).json(worklog)
 }
-
-//domain base worklogs
-
-//
 
 // create new Worklog
 const createWorklog = async (req, res) => {

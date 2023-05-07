@@ -1,4 +1,5 @@
 const User = require('../models/userModel')
+const Leave = require('../models/leaveModel')
 const jwt = require('jsonwebtoken')
 
 const createToken = (_id) => {
@@ -64,4 +65,28 @@ const signupUser = async (req, res) => {
   }
 }
 
-module.exports = { signupUser, loginUser, getUsers, getUser }
+// Leave
+const takeLeave = async (req, res) => {
+  const { leaveDate, leaveTitle } = req.body;
+
+  if(!leaveDate || !leaveTitle) {
+    return res.status(400).json({ error: 'Please fill in all the fields' })
+  }
+
+  try {
+    const user_id = req.user._id
+    const leaveday = await Leave.create({ leaveDate, leaveTitle, user_id })
+    res.status(200).json(leaveday)
+  } catch (err) {
+    return res.status(400).json({error: err.message})
+  }
+}
+const getLeave = async (req, res) => {
+  const user_id = req.user._id
+
+  const leavedays = await Leave.find({user_id}).sort({createdAt: -1})
+
+  res.status(200).json(leavedays)
+}
+
+module.exports = { signupUser, loginUser, getUsers, getUser, takeLeave, getLeave }

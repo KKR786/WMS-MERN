@@ -5,7 +5,12 @@ import { useAuthContext } from "../hooks/useAuthContext";
 
 function LeavePlan() {
   const { user } = useAuthContext();
+  const [leaveForm, setLeaveForm] = React.useState(false)
+  const [leaveTitle, setLeaveTitle] = React.useState("");
+  const [error, setError] = React.useState(null);
+  const [success, setSuccess] = React.useState(null);
   const [holidays, setHolidays] = React.useState([]);
+  const [leaveDays, setLeaveDays] = React.useState([]);
   let date = new Date();
   const [selectedDate, setSelectedDate] = React.useState(date);
 
@@ -21,11 +26,26 @@ function LeavePlan() {
          //   console.log(new Date(d.date).toLocaleString('en-ca', {dateStyle: 'short'}));
          // })
          setHolidays([...holidays, ...json.map((day) => ({ date: new Date(day.date), name: day.title}))])
-         // setHolidays(json)
        }
      }
      if (user) {
        fetchHolidays();
+     }
+   },[user]);
+
+   React.useEffect(() => {
+    const fetchLeavedays = async() => {
+     const res = await fetch("/api/user/leaves", {
+       headers: { Authorization: `Bearer ${user.token}` }
+       });
+ 
+       const json = await res.json();
+       if(res.ok) {
+        setLeaveDays([...leaveDays, ...json.map((day) => ({ date: new Date(day.leaveDate), name: day.leaveTitle}))])
+       }
+     }
+     if (user) {
+       fetchLeavedays();
      }
    },[user]);
 
@@ -37,6 +57,12 @@ function LeavePlan() {
     ) {
       return "holiday-tile";
     }
+    else if (
+        view === "month" &&
+        leaveDays.find((leaveDay) => leaveDay.date.toDateString() === date.toDateString())
+      ) {
+        return "leaveDay-tile";
+      }
     return null;
   };
   
@@ -53,31 +79,98 @@ function LeavePlan() {
     return null; 
   };
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    if(!holidays.find((holiday) => holiday.date.toDateString() === date.toDateString())){
-        const name = prompt('Note for Leave: ');
-        if (name) {
-        const confirmed = window.confirm(`Hi ${name}, are you sure you want to select this date: ${date.toString()}?`);
-        if (confirmed) {
-            alert('Leave added');
-        } else {
-            alert('You have cancelled!');
+  const leaveSubmit = async (e) => {
+
+    e.preventDefault();
+
+    if (!user) {
+        setError("You must be logged in");
+        return;
+      }
+    const leaveDate = new Date(selectedDate).toISOString().slice(0, 10);
+    console.log(leaveDate);
+    const leaveDay = { leaveDate, leaveTitle }
+    const res = await fetch('/api/user/leave', { 
+        method: 'POST',
+        body: JSON.stringify(leaveDay),
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`
         }
-        }
+    });
+    const json = await res.json();
+    if (!res.ok) {
+    setError(json.error);
+    setSuccess('')
     }
+    if (res.ok) {
+        setSelectedDate("");
+        setLeaveTitle('')
+        setSuccess("Leave added successfully!");
+        setError('')
+    }
+}
+
+const handleDateChange = async (date) => {
+    const selectedDate = new Date(
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    );
+    setSelectedDate(selectedDate);
+  
+    if (
+      !holidays.find(
+        (holiday) => holiday.date.toDateString() === selectedDate.toDateString()
+      )
+    ) {
+      setLeaveForm(true);
+    }
+    console.log(selectedDate);
   };
   
+  
+  console.log(selectedDate)
 
   return (
     <div className="section">
         <div className="container">
+        {
+            leaveForm && (
+            <div className="form-popup m-auto">
+            <span
+              className="float-right top-0 cancel"
+              onClick={() => {setLeaveForm(false);setSuccess("");
+              setError('')}}
+            >
+              X
+            </span>
+            <h3 className="text-center">Add Leave</h3>
+            <form
+              className="d-flex flex-wrap justify-content-between mt-5"
+              onSubmit={leaveSubmit}
+            >
+              <div className="agency-input">
+                <label>Note for Leave:</label>
+                <input
+                  type="text"
+                  onChange={(e) => setLeaveTitle(e.target.value)}
+                  value={leaveTitle}
+                />
+              </div>
+              <div className="d-flex align-items-center">
+                <button className="updateBtn">Leave</button>
+              </div>
+              {error && <div className="error">{error}</div>}
+            </form>
+            {success && <div className="success">{success}</div>}
+          </div>
+        )}
+
         <h1 className="my-5 text-center">
           Yearly Calendar
         </h1>
         <div className="d-flex justify-content-center">
             <Calendar
-                value={selectedDate}
+              value={selectedDate}
               onChange={handleDateChange}
               tileContent={tileContent}
               tileClassName={tileClassName}

@@ -21,7 +21,7 @@ export default React.memo(function Home() {
   const endDate = new Date();
 
   let currentDate = startDate;
-  while (currentDate <= endDate) {
+  while (currentDate < endDate || currentDate.getMonth() === endDate.getMonth()) {
     const monthLabel = currentDate.toLocaleString('default', { month: 'long' });
     const yearLabel = currentDate.getFullYear();
     const optionValue = `${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
@@ -29,17 +29,19 @@ export default React.memo(function Home() {
     options.push({ value: optionValue, label: optionLabel });
     currentDate.setMonth(currentDate.getMonth() + 1);
   }
-
+  
   // Set the initial state to the current month's option
   const defaultMonth = new Date().toLocaleString('default', { month: 'long' });
+  
   const defaultYear = new Date().getFullYear();
+  
   const defaultOption = options.find(
     option => option.label === `${defaultMonth} ${defaultYear}`
   );
-
+  
   const [selectedOption, setSelectedOption] = React.useState(defaultOption);
   const [selectedMonth, selectedYear] = selectedOption.value.split('-');
-
+   
   const monthNames = [
     "January",
     "February",

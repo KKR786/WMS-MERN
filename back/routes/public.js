@@ -9,14 +9,21 @@ const {
   deleteWorklog,
   updateWorklog
 } = require('../controllers/worklogController')
-const requireAuth = require('../middleware/requireAuth')
 
 const { getHoliDays, getAllDomains, getWorkTypes } = require('../controllers/systemController')
+
+const { takeLeave, getLeave } = require('../controllers/userController')
+
+const requireAuth = require('../middleware/requireAuth')
 
 const router = express.Router()
 
 // middleware
 router.use(requireAuth)
+
+//leave
+router.post('/user/leave', takeLeave)
+router.get('/user/leaves', getLeave)
 
 //Get systems
 router.get('/system/holidays', getHoliDays)

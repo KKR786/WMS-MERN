@@ -17,7 +17,7 @@ function SystemSettings() {
   const [date, setDate] = useState("");
   const [worklogMonth, setWorklogMonth] = useState(false);
   const [month, setMonth] = useState("");
-
+  console.log(date)
   const holidaySubmit = async (e) => {
     e.preventDefault();
 
