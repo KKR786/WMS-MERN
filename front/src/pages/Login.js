@@ -30,7 +30,7 @@ const Login = () => {
       <div className="login-box">
       <h1 className="text-center">Sign In</h1>
         <form className="login" onSubmit={handleSubmit}>
-          <label>Email address:</label>
+          <label>Email:</label>
           <input
             type="email"
             onChange={(e) => setEmail(e.target.value)}

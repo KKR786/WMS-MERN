@@ -11,12 +11,13 @@ function LeavePlan() {
   const [success, setSuccess] = React.useState(null);
   const [holidays, setHolidays] = React.useState([]);
   const [leaveDays, setLeaveDays] = React.useState([]);
+  const [totalLeave, setTotalLeave] = React.useState(0);
   let date = new Date();
   const [selectedDate, setSelectedDate] = React.useState(date);
 
   React.useEffect(() => {
     const fetchHolidays = async() => {
-     const res = await fetch("/api/system/holidays", {
+    const res = await fetch("/api/system/holidays", {
        headers: { Authorization: `Bearer ${user.token}` }
        });
  
@@ -48,6 +49,26 @@ function LeavePlan() {
        fetchLeavedays();
      }
    },[user]);
+
+   React.useEffect(() => {
+        const leavesCount = leaveDays.filter((leave) => {
+        const leaveDate = new Date(leave.date);
+        const current = new Date()
+        const currentYear = current.getFullYear();
+        const currentMonth = current.getMonth() + 1;
+        console.log(currentMonth)
+        
+        const julyFirst = currentMonth < 7 ? new Date(`${currentYear-1}-07-01`) : new Date(`${currentYear}-07-01`);
+        const nextJune = currentMonth < 7 ? new Date(`${currentYear}-06-30`) : new Date(`${currentYear+1}-06-30`);
+    
+        return leaveDate >= julyFirst && leaveDate <= nextJune;
+      }).length;
+      setTotalLeave(leavesCount);
+   }, [leaveDays])
+   
+   
+console.log(leaveDays, holidays)
+  console.log(totalLeave)
 
    const tileClassName = ({ date, view }) => {
     
@@ -111,6 +132,7 @@ function LeavePlan() {
     }
 }
 
+
 const handleDateChange = async (date) => {
     const selectedDate = new Date(
       Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
@@ -118,17 +140,15 @@ const handleDateChange = async (date) => {
     setSelectedDate(selectedDate);
   
     if (
-      !holidays.find(
-        (holiday) => holiday.date.toDateString() === selectedDate.toDateString()
-      )
+      !(holidays.find(
+        (holiDay) => holiDay.date.toDateString() === selectedDate.toDateString()
+      ) || leaveDays.find(
+        (leaveDay) => leaveDay.date.toDateString() === selectedDate.toDateString()
+      ))
     ) {
       setLeaveForm(true);
     }
-    console.log(selectedDate);
   };
-  
-  
-  console.log(selectedDate)
 
   return (
     <div className="section">
@@ -176,6 +196,7 @@ const handleDateChange = async (date) => {
               tileClassName={tileClassName}
             />
         </div>
+        <h3 className="text-center mt-5">Total Leave: {totalLeave}</h3>
         </div>
     </div>
   )

@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 
 //get all worklogs for report
 const allWorklogs = async (req, res) => {
-  const { startDate, endDate, domain, agency, type } = req.body;
+  const { startDate, endDate, ticketId, domain, agency, type, user_id } = req.body;
   let query = {};
 
   if (domain) {
@@ -14,6 +14,12 @@ const allWorklogs = async (req, res) => {
   }
   if(type) {
     query.type = type;
+  }
+  if(ticketId) {
+    query.ticketId = ticketId;
+  }
+  if(user_id) {
+    query.user_id = user_id;
   }
   query.date = { $gte: startDate, $lte: endDate };
   const worklogs = await Worklog.find(query);
@@ -83,9 +89,9 @@ const getWorklog = async (req, res) => {
 
 // create new Worklog
 const createWorklog = async (req, res) => {
-  const { date, ticketId, domain, agency, time, type } = req.body
+  const { date, ticketId, domain, agency, time, type, note, usersTag } = req.body
 
-  let emptyFields = []
+  let emptyFields = [];
 
   if(!date) {
     emptyFields.push('date')
@@ -112,10 +118,10 @@ const createWorklog = async (req, res) => {
   // add doc to db
   try {
     const user_id = req.user._id
-    const worklog = await Worklog.create({ date, ticketId, domain, agency, time, type, user_id })
+    const worklog = await Worklog.create({ date, ticketId, domain, agency, time, type, note, usersTag, user_id })
     res.status(201).json(worklog)
   } catch (error) {
-    res.status(400).json({error: error.message})
+    res.status(400).json({error: error.message, emptyFields})
   }
 }
 

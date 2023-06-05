@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useLogout } from "../hooks/useLogout";
 
@@ -21,7 +22,7 @@ function TopBar(props) {
   };
   return (
     <nav className="navbar navbar-expand bg-white topBar">
-      <div className="container py-3">
+      <div className="w-100 py-3">
         <div className="d-flex justify-content-between align-items-center w-100">
           <span className="material-symbols-outlined hamburger" onClick={hamburgerOnClick}>
             menu
@@ -35,8 +36,18 @@ function TopBar(props) {
             </span>
           </div>
           <div className={`dropdown-content ${isOpen ? "show" : ""}`}>
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
+            <Link className="nav-link" to="/worklogs">
+              <span className="material-symbols-outlined mr-2">
+                work_history
+              </span>
+              My Worklog
+            </Link>
+            <Link className="nav-link" to="/profile">
+              <span className="material-symbols-outlined mr-2">
+                account_circle
+              </span>
+              My Profile
+            </Link>
             <button
               className="dropbtn d-flex align-items-center"
               onClick={handleClick}

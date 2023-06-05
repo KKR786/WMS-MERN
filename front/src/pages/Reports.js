@@ -27,6 +27,7 @@ function Reports() {
     currentMonthFirstDate.toLocaleDateString("en-CA")
   );
   const [endDate, setEndDate] = useState(currentDate);
+  const [ticketId, setTicketId] = useState('')
   const [domain, setDomain] = useState("");
   const [agency, setAgency] = useState("");
   const [type, setType] = useState("");
@@ -34,6 +35,8 @@ function Reports() {
   const [names, setNames] = useState([{}]);
   const [domains, setDomains] = useState([]);
   const [agencies, setAgencies] = useState([]);
+  const [users, setUsers] = useState([{}])
+  const [user_id, setUser_Id] = useState('')
   const [savedTypes, setSaveTypes] = useState([])
 
 
@@ -117,9 +120,11 @@ function Reports() {
           body: JSON.stringify({
             startDate,
             endDate,
+            ticketId,
             domain,
             agency,
-            type
+            type,
+            user_id
           }),
         });
 
@@ -144,7 +149,26 @@ function Reports() {
     }
   };
 
-  names.forEach((user) => console.log(user.name));
+  React.useEffect(() => {
+    const fetchUsers = async () => {
+      const res = await fetch('/api/users', {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        const userList = json.map((data) => {return {
+          name: data.name,
+          id: data._id
+        }});
+        setUsers(userList);
+      }
+    };
+
+    if (user) {
+      fetchUsers();
+    }
+  }, [ user]);
 
   return (
     <div className="section">
@@ -168,6 +192,15 @@ function Reports() {
             />
           </div>
           <div className="report-item">
+            <label>Ticket Id:</label>
+            <input
+              type="number"
+              onChange={(e) => setTicketId(e.target.value)}
+              value={ticketId}
+              min="0"
+            />
+          </div>
+          <div className="report-item">
             <label>Domain:</label>
             <Select 
               placeholder = "Select Domain"
@@ -187,7 +220,7 @@ function Reports() {
               id = "agency"
             />
           </div>
-          <div className="report-item">
+          <div className="report-item m-auto">
             <label>Work Type:</label>
             <Select 
               placeholder = "Select Work Type"
@@ -195,6 +228,16 @@ function Reports() {
               value={savedTypes.find(obj => obj.value === type)}
               onChange = {(e) => setType(e.value)}
               id = "type"
+            />
+          </div>
+          <div className="report-item m-auto">
+            <label>User:</label>
+            <Select 
+              placeholder = "Select User"
+              options = {[{ label: "--Select--" }, ...users.map((user) => ({ value: user.id, label: user.name }))]}
+              value={users.find((obj) => obj.value === user_id)}
+              onChange={(e) => setUser_Id(e.value)}
+              id="type"
             />
           </div>
           <div className="m-auto">

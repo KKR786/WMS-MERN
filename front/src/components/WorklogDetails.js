@@ -15,16 +15,6 @@ const WorklogDetails = ({ worklogs, date }) => {
   const { user } = useAuthContext();
 
   React.useEffect(() => {
-    // if (worklogs) {
-    //   const date = "2023-02-01";
-    //   const date2 = "2023-02-04";
-    //   const filteredWorklog = worklogs.filter((worklog) => {
-    //     const logDate = new Date(worklog.date);
-    //     return logDate >= new Date(date) && logDate <= new Date(date2);
-    //   });
-    //   const totalHour = filteredWorklog.reduce((total, worklog) => total + (worklog.time/60), 0);
-    //   console.log(totalHour);
-    // }
     if (worklogs) {
       const filteredWorklogs = worklogs.filter(
         (worklog) => date === worklog.date
@@ -88,6 +78,7 @@ const WorklogDetails = ({ worklogs, date }) => {
                 <th>Agency</th>
                 <th>Work Type</th>
                 <th>Hours</th>
+                <th>Mention</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -112,6 +103,7 @@ const WorklogDetails = ({ worklogs, date }) => {
                         <td>{worklog.agency}</td>
                         <td>{worklog.type}</td>
                         <td>{(worklog.time / 60).toFixed(2)}</td>
+                        <td>{worklog.usersTag.join(", ")}</td>
                         <td>
                           <span
                             className="material-symbols-outlined btn editBtn"

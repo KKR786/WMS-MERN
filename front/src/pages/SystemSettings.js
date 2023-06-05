@@ -15,8 +15,6 @@ function SystemSettings() {
   const [holidaysForm, setHolidaysForm] = useState(false);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  const [worklogMonth, setWorklogMonth] = useState(false);
-  const [month, setMonth] = useState("");
   console.log(date)
   const holidaySubmit = async (e) => {
     e.preventDefault();
@@ -139,7 +137,6 @@ function SystemSettings() {
               setDomainForm(true);
               setWorkTypeForm(false);
               setHolidaysForm(false);
-              setWorklogMonth(false);
             }}
           >
             Add New Domain
@@ -151,7 +148,6 @@ function SystemSettings() {
               setWorkTypeForm(true);
               setDomainForm(false);
               setHolidaysForm(false);
-              setWorklogMonth(false);
             }}
           >
             Catagorized Work Type
@@ -163,22 +159,9 @@ function SystemSettings() {
               setHolidaysForm(true);
               setWorkTypeForm(false);
               setDomainForm(false);
-              setWorklogMonth(false);
             }}
           >
             Set Holidays
-          </li>
-
-          <li
-            className="list-group-item list-group-item-warning"
-            onClick={() => {
-              setWorklogMonth(true);
-              setHolidaysForm(false);
-              setWorkTypeForm(false);
-              setDomainForm(false);
-            }}
-          >
-            Select Worklog Month
           </li>
         </ul>
 

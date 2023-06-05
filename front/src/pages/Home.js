@@ -9,6 +9,7 @@ export default React.memo(function Home() {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const { monthlyWorklogs, dispatch } = useWorklogsContext();
+
   const [total, setTotal] = React.useState(0);
   const [monthlyTotal, setMonthlyTotal] = React.useState(0);
   const [csm, setCsm] = React.useState(0);
@@ -242,7 +243,7 @@ export default React.memo(function Home() {
       setMonthlyAbit(0);
     }
   }, [monthlyWorklogs]);
-
+  
   return (
     <div className="section">
       <div className="container">

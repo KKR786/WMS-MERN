@@ -5,7 +5,6 @@ const leaveSchema = new Schema({
     leaveDate: {
       type: String,
       required: true,
-      unique: true
     },
     leaveTitle: {
       type: String,

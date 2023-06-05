@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import ManageUsers from "./pages/ManageUsers";
 import SystemSettings from "./pages/SystemSettings";
 import ManageRoles from "./pages/ManageRoles";
+import MyWorklog from "./pages/MyWorklog";
 
 
 function App() {
@@ -42,6 +43,10 @@ function App() {
               <Route
                 path="/worklog"
                 element={user ? <Worklog /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/worklogs"
+                element={user ? <MyWorklog /> : <Navigate to="/login" />}
               />
               <Route
                 path="/leave-plan"

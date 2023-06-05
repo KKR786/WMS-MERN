@@ -27,6 +27,12 @@ const worklogSchema = new Schema({
     type: String,
     required: true
   },
+  note: {
+    type: String
+  },
+  usersTag: {
+    type: [String]
+  },
   user_id: {
     type: Number,
     required: true

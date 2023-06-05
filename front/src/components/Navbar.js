@@ -77,6 +77,19 @@ const Navbar = (props) => {
                     </Link>
                   </li>
                   <li
+                    onClick={() => handleLinkClick("/worklogs")}
+                    className={
+                      activeLink === "/worklogs" ? "nav-item active" : "nav-item"
+                    }
+                  >
+                    <Link className="nav-link" to="/worklogs">
+                      <span className="material-symbols-outlined mr-2">
+                        work_history
+                      </span>
+                      My Worklog
+                    </Link>
+                  </li>
+                  <li
                     onClick={() => handleLinkClick("/leave-plan")}
                     className={
                       activeLink === "/leave-plan" ? "nav-item active" : "nav-item"
@@ -89,6 +102,7 @@ const Navbar = (props) => {
                       Leave Plan
                     </Link>
                   </li>
+
                   {user.role === "Super-Admin" && (
                     <>
                       <li className="sidebar-header">Super Admin Tools</li>
@@ -164,28 +178,6 @@ const Navbar = (props) => {
         </div>
       )}
     </>
-
-    // <header>
-    //   <div classNameName="container">
-    //     <Link to="/">
-    //       <h1>Worklog</h1>
-    //     </Link>
-    //     <nav>
-    //       {user && (
-    //         <div>
-    //           <span>{user.name}</span>
-    //           <button onClick={handleClick}>Log out</button>
-    //         </div>
-    //       )}
-    //       {!user && (
-    //         <div>
-    //           <Link to="/login">Login</Link>
-    //           <Link to="/signup">Signup</Link>
-    //         </div>
-    //      )}
-    //     </nav>
-    //   </div>
-    // </header>
   );
 };
 
