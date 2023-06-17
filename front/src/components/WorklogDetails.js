@@ -36,7 +36,7 @@ const WorklogDetails = ({ worklogs, date }) => {
     setWId(id);
     setEdit(true);
     console.log("p");
-  }, []);
+  }, [setWId, setEdit]);
 
   const deleteOnClick = async (id) => {
     if (!user) {

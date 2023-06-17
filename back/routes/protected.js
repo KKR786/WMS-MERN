@@ -1,7 +1,7 @@
 const express = require('express')
 
 const { newDomain, newWorkType, setHolidays } = require('../controllers/systemController')
-const { allWorklogs } = require('../controllers/worklogController')
+const { allWorklogs, totalMonthlyWorklogs } = require('../controllers/worklogController')
 const { signupUser } = require('../controllers/userController')
 
 const requireAuth = require('../middleware/requireAuth')
@@ -19,6 +19,9 @@ router.post('/system/holiday', setHolidays)
 
 //reports
 router.post('/reports', allWorklogs)
+
+//monthlyWorklogs
+router.get('/monthly-logs', totalMonthlyWorklogs)
 
 
 //create Account

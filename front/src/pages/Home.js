@@ -4,6 +4,7 @@ import "react-calendar/dist/Calendar.css";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useLogout } from "../hooks/useLogout";
+import PieChart from "../components/charts/PieChart";
 
 export default React.memo(function Home() {
   const { user } = useAuthContext();
@@ -12,6 +13,7 @@ export default React.memo(function Home() {
 
   const [total, setTotal] = React.useState(0);
   const [monthlyTotal, setMonthlyTotal] = React.useState(0);
+  const [totalMonthlyHours, setTotalMonthlyHours] = React.useState([{}]);
   const [csm, setCsm] = React.useState(0);
   const [abit, setAbit] = React.useState(0);
   const [monthlyCsm, setMonthlyCsm] = React.useState(0);
@@ -185,6 +187,54 @@ export default React.memo(function Home() {
       fetchWorklogs();
     }
   }, [dispatch, user]);
+
+  React.useEffect(() => {
+    const fetchWorklogs = async () => {
+      const response = await fetch(
+        `/api/protected/monthly-logs?month=${
+          selectedMonth
+        }&year=${selectedYear}`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      const json = await response.json();
+      if(response.status === 401) {
+        alert('You are not authorized to view this page. Please login.')
+        logout();
+        return;
+      }
+      if (response.ok) {
+        if(json) {
+          const filterCSM = json.filter(
+            (worklog) => "CSM" === worklog.agency
+          );
+          const csmHours = filterCSM.reduce(
+            (total, worklog) => total + worklog.time / 60,
+            0
+          );
+          const filterABIT = json.filter(
+            (worklog) => "ABIT" === worklog.agency
+          );
+          const abitHours = filterABIT.reduce(
+            (total, worklog) => total + worklog.time / 60,
+            0
+          );
+
+          const totalMonthlyHours = [
+            { x: "CSM", y: Number(csmHours.toFixed(2)), color: '#f1bf64' },
+            { x: "ABIT", y: Number(abitHours.toFixed(2)), color: '#36A2EB' },
+          ];
+        
+          setTotalMonthlyHours(totalMonthlyHours);
+        }
+      }
+    };
+
+    if (user) {
+      fetchWorklogs();
+    }
+  }, [ user, selectedMonth ]);
 
   React.useEffect(() => {
     const fetchWorklogs = async () => {
@@ -456,6 +506,12 @@ export default React.memo(function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="row mt-5">
+          <div className="col-md-6">
+            <PieChart data={totalMonthlyHours} month={selectedOption.label}/>
           </div>
         </div>
       </div>

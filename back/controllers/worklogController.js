@@ -30,6 +30,24 @@ const allWorklogs = async (req, res) => {
   res.status(200).json(worklogs);
 };
 
+//get all worklogs for a month
+const totalMonthlyWorklogs = async (req, res) => {
+  const { month, year } = req.query;
+
+  const startDate = new Date(year, month - 1, 1).toISOString().substr(0, 10);
+  const endDate = new Date(year, month, 1, 0, 0, -1).toISOString().substr(0, 10);
+
+  const monthLogs = await Worklog.find({
+    date: { $gte: startDate, $lte: endDate } 
+  });
+
+  if (!monthLogs || monthLogs.length === 0) {
+    return res.json({ error: 'No such Worklog' });
+  }
+
+  res.status(200).json(monthLogs);
+};
+
 // get all Worklogs of an user
 const getWorklogs = async (req, res) => {
   const user_id = req.user._id
@@ -51,7 +69,7 @@ const perDayWorklogs = async (req, res) => {
   res.status(200).json(dayLogs);
 }
 
-//get per month worklogs
+//get per month worklogs of an user
 const perMonthWorklogs = async (req, res) => {
   const { user_id } = req.params;
   const { month, year } = req.query;
@@ -164,6 +182,7 @@ const updateWorklog = async (req, res) => {
 
 module.exports = {
   allWorklogs,
+  totalMonthlyWorklogs,
   getWorklogs,
   getWorklog,
   perMonthWorklogs,

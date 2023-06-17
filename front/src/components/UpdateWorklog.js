@@ -9,9 +9,12 @@ export default function UpdateWorklog(props) {
   const [agency, setAgency] = useState("");
   const [time, setTime] = useState("");
   const [type, setType] = useState("");
+  const [note, setNote] = useState("");
+  const [users, setUsers] = useState([{}])
+  const [usersTag, setUsersTag] = useState([])
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
-  const [domains, setDomains] = useState([]);
+  const [domains, setDomains] = useState([{}]);
   const [agencies, setAgencies] = useState([]);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -22,11 +25,14 @@ export default function UpdateWorklog(props) {
 
   React.useEffect(()=>{
     if(worklog) {
+      console.log(worklog.usersTag)
         setTicketId(worklog.ticketId);
         setDomain(worklog.domain);
         setAgency(worklog.agency);
         setTime(worklog.time);
-        setType(worklog.type);  
+        setType(worklog.type);
+        setNote(worklog.note);
+        setUsersTag(worklog.usersTag);
     }
   },[worklog])
   
@@ -40,7 +46,8 @@ export default function UpdateWorklog(props) {
 
       if (res.ok) {
         console.log(json)
-        const domainList = json.map((data) => data.domain);
+        const domainList = json.map((data) => ({d: data.domain, a: data.agency}));
+        console.log(domainList)
         setDomains(domainList);
         const agencyList = [...new Set(json.map((data) => data.agency))];
         setAgencies(agencyList);
@@ -97,7 +104,13 @@ console.log(props.id)
       return;
     }
 
-    const worklog = { ticketId, domain, agency, time, type };
+    let users = [];
+    if(usersTag) {
+      usersTag.map((user, i) => users[i] = user.label);
+      console.log(users);
+    }
+
+    const worklog = { ticketId, domain, agency, time, type, note, usersTag: users };
 
     const response = await fetch(`/api/worklogs/${props.id}`, {
       method: "PATCH",
@@ -114,16 +127,40 @@ console.log(props.id)
       setEmptyFields(json.emptyFields);
     }
     if (response.ok) {
+      props.state(false)
       setTicketId("");
       setDomain("");
       setAgency("");
       setTime("");
       setType("");
+      setNote("");
+      setUsersTag([]);
       setError(null);
       setEmptyFields([]);
       dispatch({ type: "UPDATE_WORKLOG", payload: json });
     }
   };
+
+  React.useEffect(() => {
+    const fetchUsers = async () => {
+      const res = await fetch('/api/users', {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        const userList = json.map((data) => {return {
+          name: data.name,
+          id: data._id
+        }});
+        setUsers(userList);
+      }
+    };
+
+    if (user) {
+      fetchUsers();
+    }
+  }, [ user]);
 
   return (
     <>
@@ -148,10 +185,15 @@ console.log(props.id)
         <div className="reEntry">
         <label>Domain:</label>
         <Select 
-          placeholder = "Select Domain"
-          options = {domains.map((domain) => ({ value: domain, label: domain }))}
+          placeholder = {domain}
+          options = {domains.map((domain) => ({ value: domain.d, label: domain.d }))}
           value={domains.find((obj) => obj.value === domain)}
-          onChange={(e) => setDomain(e.value)}
+          onChange={(e) => {
+            setDomain(e.value);
+            const selectedDomain = e.value;
+            const filteredAgency = domains.find((domain) => domain.d === selectedDomain)?.a || [];
+            setAgency(filteredAgency);
+          }}
           className={emptyFields.includes("domain") ? "error" : ""}
           id="domain"
         />
@@ -160,7 +202,7 @@ console.log(props.id)
       <div className="reEntry">
         <label>Agency:</label>
         <Select 
-          placeholder = "Select Agency"
+          placeholder = {agency ? agency : "Select Agency"}
           options = {agencies.map((agency) => ({ value: agency, label:agency }))}
           value={agencies.find(obj => obj.value === agency)}
           onChange = {(e) => setAgency(e.value)} 
@@ -189,6 +231,26 @@ console.log(props.id)
             className={emptyFields.includes("type") ? "error" : ""}
           />
         </div>
+        <div className="reEntry">
+          <label>Note:</label>
+          <input
+            type="text"
+            onChange={(e) => setNote(e.target.value)}
+            value={note}
+          />
+        </div>
+        <div className="reEntry">
+          <label>Tag User:</label>
+          <Select 
+            placeholder="Select User"
+            isMulti
+            options={[...users.map((user) => ({ value: user.id, label: user.name }))]}
+            value={usersTag}
+            onChange={(option) => setUsersTag(option)}
+            id="type"
+          />
+        </div>
+
         <button className="updateBtn">Update</button>
         {error && <div className="error">{error}</div>}
       </form>

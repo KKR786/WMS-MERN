@@ -7,19 +7,26 @@ const Navbar = (props) => {
   const { logout } = useLogout();
   const { user } = useAuthContext();
   const location = useLocation();
-  const currentSlug = location.pathname;
-  const [activeLink, setActiveLink] = useState();
+  const [activeLink, setActiveLink] = useState("");
+  const [secondNav, setSecondNav] = useState("hide");
 
   useEffect(() => {
-    setActiveLink(currentSlug);
-  }, [currentSlug])
+    setActiveLink(location.pathname);
+  }, [location]);
 
-  const handleLinkClick = (link) => {
+  const handleClick = (link) => {
     setActiveLink(link);
+    link.includes("/worklog") ? setSecondNav("show") : setSecondNav("hide")
   };
 
-  const handleClick = () => {
-    logout();
+  const isLinkActive = (link) => {
+    if (link === "/") {
+      return activeLink === link;
+    } else if (link === "/worklog") {
+      return activeLink.startsWith(link) && !activeLink.startsWith("/worklogs");
+    } else {
+      return activeLink.startsWith(link);
+    }
   };
 
   return (
@@ -37,68 +44,51 @@ const Navbar = (props) => {
               <div className="force-overflow">
                 <ul className="nav flex-column flex-nowrap" id="ulmenu">
                   <li className="sidebar-header">Pages</li>
-                  <li
-                    onClick={() => handleLinkClick("/")}
-                    className={
-                      activeLink === "/" ? "nav-item active" : "nav-item"
-                    }
-                  >
-                    <Link className="nav-link" to="/">
-                      <span className="material-symbols-outlined mr-2">
-                        dashboard
-                      </span>
+                  <li className={isLinkActive("/") ? "nav-item active" : "nav-item"}>
+                    <Link className="nav-link" to="/" onClick={() => handleClick("/")}>
+                      <span className="material-symbols-outlined mr-2">dashboard</span>
                       Dashboard
                     </Link>
                   </li>
-                  <li
-                    onClick={() => handleLinkClick("/profile")}
-                    className={
-                      activeLink === "/profile" ? "nav-item active" : "nav-item"
-                    }
-                  >
-                    <Link className="nav-link" to="/profile">
-                      <span className="material-symbols-outlined mr-2">
-                        account_circle
-                      </span>
+                  <li className={isLinkActive("/profile") ? "nav-item active" : "nav-item"}>
+                    <Link className="nav-link" to="/profile" onClick={() => handleClick("/profile")}>
+                      <span className="material-symbols-outlined mr-2">account_circle</span>
                       Profile
                     </Link>
                   </li>
                   <li
-                    onClick={() => handleLinkClick("/worklog")}
-                    className={
-                      activeLink === "/worklog" ? "nav-item active" : "nav-item"
-                    }
+                    className={isLinkActive("/worklog") || isLinkActive("/worklogs") || secondNav === 'show'  ? "nav-item active" : "nav-item"}
                   >
-                    <Link className="nav-link" to="/worklog">
-                      <span className="material-symbols-outlined mr-2">
-                        edit_note
+                    <div
+                      className="nav-link justify-content-between"
+                      onClick={() => setSecondNav("show")}
+                    >
+                      <div className='d-flex'>
+                        <span className="material-symbols-outlined mr-2">receipt_long</span>
+                        Worklog
+                      </div>
+                      <span className="material-symbols-outlined">
+                        arrow_drop_down
                       </span>
-                      Worklog
-                    </Link>
+                    </div>
+                    <ul className={`dropdown-nav pl-3 ${secondNav}`}>
+                      <li className={isLinkActive("/worklog") ? "nav-item active" : "nav-item"}>
+                        <Link className="nav-link" to="/worklog" onClick={() => handleClick("/worklog")}>
+                          <span className="material-symbols-outlined mr-2">edit_note</span>
+                          Work Entry
+                        </Link>
+                      </li>
+                      <li className={isLinkActive("/worklogs") ? "nav-item active" : "nav-item"}>
+                        <Link className="nav-link" to="/worklogs" onClick={() => handleClick("/worklogs")}>
+                          <span className="material-symbols-outlined mr-2">work_history</span>
+                          My Worklog
+                        </Link>
+                      </li>
+                    </ul>
                   </li>
-                  <li
-                    onClick={() => handleLinkClick("/worklogs")}
-                    className={
-                      activeLink === "/worklogs" ? "nav-item active" : "nav-item"
-                    }
-                  >
-                    <Link className="nav-link" to="/worklogs">
-                      <span className="material-symbols-outlined mr-2">
-                        work_history
-                      </span>
-                      My Worklog
-                    </Link>
-                  </li>
-                  <li
-                    onClick={() => handleLinkClick("/leave-plan")}
-                    className={
-                      activeLink === "/leave-plan" ? "nav-item active" : "nav-item"
-                    }
-                  >
-                    <Link className="nav-link" to="/leave-plan">
-                      <span className="material-symbols-outlined mr-2">
-                        calendar_month
-                      </span>
+                  <li className={isLinkActive("/leave-plan") ? "nav-item active" : "nav-item"}>
+                    <Link className="nav-link" to="/leave-plan" onClick={() => handleClick("/leave-plan")}>
+                      <span className="material-symbols-outlined mr-2">calendar_month</span>
                       Leave Plan
                     </Link>
                   </li>
@@ -106,59 +96,27 @@ const Navbar = (props) => {
                   {user.role === "Super-Admin" && (
                     <>
                       <li className="sidebar-header">Super Admin Tools</li>
-                      <li
-                        onClick={() => handleLinkClick("/reports")}
-                        className={
-                          activeLink === "/reports"
-                            ? "nav-item active"
-                            : "nav-item"
-                        }
-                      >
-                        <Link className="nav-link" to="/reports">
-                          <span className="material-symbols-outlined mr-2">
-                            summarize
-                          </span>
+                      <li className={isLinkActive("/reports") ? "nav-item active" : "nav-item"}>
+                        <Link className="nav-link" to="/reports" onClick={() => handleClick("/reports")}>
+                          <span className="material-symbols-outlined mr-2">summarize</span>
                           Reports
                         </Link>
                       </li>
-                      <li
-                        onClick={() => handleLinkClick("/role-management")}
-                        className={
-                          activeLink === "/role-management" ? "nav-item active" : "nav-item"
-                        }
-                      >
-                        <Link className="nav-link" to="/role-management">
-                          <span className="material-symbols-outlined mr-2">
-                            settings_accessibility
-                          </span>
+                      {/* <li className={isLinkActive("/role-management") ? "nav-item active" : "nav-item"}>
+                        <Link className="nav-link" to="/role-management" onClick={() => handleClick("/role-management")}>
+                          <span className="material-symbols-outlined mr-2">settings_accessibility</span>
                           Role Management
                         </Link>
-                      </li>
-                      <li
-                        onClick={() => handleLinkClick("/system-settings")}
-                        className={
-                          activeLink === "/system-settings"
-                            ? "nav-item active"
-                            : "nav-item"
-                        }
-                      >
-                        <Link className="nav-link" to="/system-settings">
-                          <span className="material-symbols-outlined mr-2">
-                            settings_suggest
-                          </span>
+                      </li> */}
+                      <li className={isLinkActive("/system-settings") ? "nav-item active" : "nav-item"}>
+                        <Link className="nav-link" to="/system-settings" onClick={() => handleClick("/system-settings")}>
+                          <span className="material-symbols-outlined mr-2">settings_suggest</span>
                           System Settings
                         </Link>
                       </li>
-                      <li
-                        onClick={() => handleLinkClick("/users")}
-                        className={
-                          activeLink === "/users" ? "nav-item active" : "nav-item"
-                        }
-                      >
-                        <Link className="nav-link" to="/users">
-                          <span className="material-symbols-outlined mr-2">
-                            manage_accounts
-                          </span>
+                      <li className={isLinkActive("/users") ? "nav-item active" : "nav-item"}>
+                        <Link className="nav-link" to="/users" onClick={() => handleClick("/users")}>
+                          <span className="material-symbols-outlined mr-2">manage_accounts</span>
                           User Management
                         </Link>
                       </li>
@@ -169,7 +127,7 @@ const Navbar = (props) => {
             </div>
             <button
               className="nav-link mb-4 bg-transparent logoutBtn"
-              onClick={handleClick}
+              onClick={logout}
             >
               <span className="material-symbols-outlined mr-2">logout</span>
               Logout

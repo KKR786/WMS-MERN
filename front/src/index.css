@@ -6,6 +6,63 @@
   --primary: #1aac83;
   --error: #e7195a;
 }
+
+/*Charts*/
+.VictoryContainer {
+  height: 86%!important;
+}
+.color-indicators {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.color-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.color-indicator__circle {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 10%;
+  margin-right: 5px;
+}
+
+.color-indicator__label {
+  font-size: 16px;
+}
+
+
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+    background: #2a2a2a;
+}
+
+.show .nav-item a {
+    color: #fff;
+}
+
+.active a,
+.show .nav-item.active a {
+    color: #0056b3;
+}
+
+ul.dropdown-nav {
+    list-style: none;
+    padding-top: 5px;
+}
+
+.dropdown-nav .nav-item:hover {
+    background: rgb(138, 192, 56);
+    font-weight: 600;
+}
+
 .App {
   align-items: stretch;
   display: flex;
@@ -17,6 +74,7 @@
 	float: left;
 	height: 510px;
 	width: auto;
+  overflow-x: hidden;
 	overflow-y: scroll;
 	margin-bottom: 20px;
 }
@@ -210,10 +268,6 @@ body {
 .active a {
   color: #0056b3;
 }
-.nav-item {
-  display: flex;
-  align-items: center;
-}
 .nav-link {
   position: relative;
   font-size: 14px;
@@ -225,6 +279,7 @@ body {
   display: flex;
   align-items: center;
   cursor: pointer;
+  margin-left: 10px;
 }
 .logoutBtn {
   position: absolute;
@@ -649,7 +704,6 @@ nav {
   display: flex;
   align-items: center;
 }
-nav a,
 nav button {
   margin-left: 10px;
 }
