@@ -15,7 +15,7 @@ function SystemSettings() {
   const [holidaysForm, setHolidaysForm] = useState(false);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  console.log(date)
+  
   const holidaySubmit = async (e) => {
     e.preventDefault();
 

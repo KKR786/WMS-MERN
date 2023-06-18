@@ -1,6 +1,7 @@
 const User = require('../models/userModel')
 const Leave = require('../models/leaveModel')
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 
 const createToken = (_id) => {
   return jwt.sign({_id}, process.env.SECRET, { expiresIn: '30d' })
@@ -65,6 +66,24 @@ const signupUser = async (req, res) => {
   }
 }
 
+// update user profile
+const updateUserProfile = async (req, res) => {
+  const id  = req.params._id;
+
+  if (isNaN(id)) {
+    return res.status(404).json({error: 'User Not Found'})
+  }
+
+  const updatedUser = await User.findOneAndUpdate({_id: id}, { ...req.body }, { new: true });
+
+  if (!updatedUser) {
+    return res.status(400).json({error: 'No User Found'})
+  }
+  else {
+    return res.status(200).json(updatedUser)
+  }
+}
+
 // Leave
 const takeLeave = async (req, res) => {
   const { leaveDate, leaveTitle } = req.body;
@@ -89,4 +108,4 @@ const getLeave = async (req, res) => {
   res.status(200).json(leavedays)
 }
 
-module.exports = { signupUser, loginUser, getUsers, getUser, takeLeave, getLeave }
+module.exports = { signupUser, loginUser, updateUserProfile, getUsers, getUser, takeLeave, getLeave }

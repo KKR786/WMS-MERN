@@ -20,6 +20,22 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  company: {
+    type: String
+  },
+  department: {
+    type: String
+  },
+  designation: {
+    type: String
+  },
+  phone: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String
+  },
   password: {
     type: String,
     required: true

@@ -2,24 +2,81 @@ import React, { useState } from 'react'
 import { useAuthContext } from "../hooks/useAuthContext";
 
 function Profile() {
-    const { user } = useAuthContext();
-    const [edit, setEdit] = useState(false)
-    const [error, setError] = useState(null);
-    const [emptyFields, setEmptyFields] = useState([]);
-    const [name, setName] = useState(user.name)
-    const [email, setEmail] = useState(user.email)
-    const [company, setCompany] = useState(user.company)
-    const [department, setDepartment] = useState(user.department)
-    const [designation, setDesignation] = useState(user.designation)
-    const [phone, setPhone] = useState(user.phone)
-    const [location, setLocation] = useState(user.location)
-    const [currentPassword, setCurrentPassword] = useState('')
-    const [newPassword, setNewPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
+  const { user } = useAuthContext();
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [emptyFields, setEmptyFields] = useState([]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
+  const [department, setDepartment] = useState('');
+  const [designation, setDesignation] = useState('');
+  const [phone, setPhone] = useState('');
+  const [location, setLocation] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
-    const handleSubmit = () => {
-      console.log('hi')
+  React.useEffect(() => {
+    const userData = async () => {
+      const res = await fetch(`/api/users/unique?_id=${user.id}`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      const json = await res.json();
+      
+      if (res.ok) {
+        const { name, email, company, department, designation, phone, location } = json.user;
+        setName(name || '');
+        setEmail(email || '');
+        setCompany(company || '');
+        setDepartment(department || '');
+        setDesignation(designation || '');
+        setPhone(phone || '');
+        setLocation(location || '');
+      }
+    };
+  
+    if (user) {
+      userData();
     }
+  }, [user]);
+  
+  
+  const handleSubmit = () => {
+    console.log('hi')
+  }
+
+  const handleUpdate = async (e) => {
+    e.preventDefault()
+
+    if (!user) {
+      setError("You must be logged in");
+      return;
+    }
+
+    const updatedUser = { name, email, company, department, designation, phone, location }
+    
+    const res = await fetch(`/api/users/profile/${user.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updatedUser),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      }
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      setError(json.error);
+      setSuccess('')
+    }
+    if (res.ok) {
+      setSuccess('Profile Updated Successfully')
+      setError(null);
+    }
+
+  }
 
   return (
     <div className='section'>
@@ -29,7 +86,7 @@ function Profile() {
           <div className='col-xl-8'>
             <div className='my-profile'>
               <h4>Profile Details</h4>
-              <form className="d-flex flex-wrap justify-content-between mt-5" onSubmit={handleSubmit}>
+              <form className="d-flex flex-wrap justify-content-between mt-5" onSubmit={handleUpdate}>
                 <label>Name:</label>
                 <input
                   value={name}
@@ -42,7 +99,7 @@ function Profile() {
                   onChange={(e) => setEmail(e.target.value)}
                   className={emptyFields.includes("email") ? "error" : ""}
                 />
-                  <label>Company:</label>
+                <label>Company:</label>
                 <input
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
@@ -72,9 +129,11 @@ function Profile() {
                   onChange={(e) => setLocation(e.target.value)}
                   className={emptyFields.includes("location") ? "error" : ""}
                 />
-                  <button className="passBtn">
-                    Save Changes
-                  </button>
+                <button className="passBtn" type='submit'>
+                  Save Changes
+                </button>
+                {error && <div className="error">{error}</div>}
+                {success && <div className="success">{success}</div>}
               </form>
             </div>
           </div>
@@ -111,7 +170,7 @@ function Profile() {
               </form>
             </div>
           </div>
-        </div>  
+        </div>
 
 
         {/* <div className='profile-card mt-4'>

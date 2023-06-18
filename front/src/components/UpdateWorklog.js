@@ -96,6 +96,7 @@ console.log(props.id)
   }, [dispatch, props.id, user])
 
   console.log(worklog)
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
