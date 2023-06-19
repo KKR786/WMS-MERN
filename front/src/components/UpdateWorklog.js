@@ -96,7 +96,7 @@ console.log(props.id)
   }, [dispatch, props.id, user])
 
   console.log(worklog)
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -173,7 +173,7 @@ console.log(props.id)
       </div>
       <form className="d-flex flex-wrap justify-content-between mt-5" onSubmit={handleSubmit}>
         <div className="reEntry">
-          <label>Ticket_Id:</label>
+          <label>Ticket Id:</label>
           <input
             type="number"
             value={ticketId}
@@ -246,7 +246,7 @@ console.log(props.id)
             placeholder="Select User"
             isMulti
             options={[...users.map((user) => ({ value: user.id, label: user.name }))]}
-            value={usersTag}
+            value={usersTag.map((user) => ({ value: user, label: user }))}
             onChange={(option) => setUsersTag(option)}
             id="type"
           />

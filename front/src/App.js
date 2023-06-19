@@ -12,6 +12,7 @@ import Worklog from "./pages/Worklog";
 import LeavePlan from "./pages/LeavePlan";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
+import UsersProfile from "./pages/UsersProfile";
 import ManageUsers from "./pages/ManageUsers";
 import SystemSettings from "./pages/SystemSettings";
 import ManageRoles from "./pages/ManageRoles";
@@ -39,6 +40,10 @@ function App() {
               <Route
                 path="/profile"
                 element={user ? <Profile /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/user/profile/:userId"
+                element={user ? <UsersProfile /> : <Navigate to="/login" />}
               />
               <Route
                 path="/worklog"

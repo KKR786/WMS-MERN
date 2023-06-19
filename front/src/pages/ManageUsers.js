@@ -40,11 +40,13 @@ function ManageUsers() {
             {users &&
               users.map((user, i) =>
                 <li key={i}>
-                  <div className="user-card">
-                    <h4 className='h3'>{user.name}</h4>
-                    <span>Email: {user.email}</span>
-                    <span>Role: {user.role}</span>
-                  </div>
+                  <Link to={`/user/profile/${user._id}`}>
+                    <div className="user-card">
+                      <h4 className='h3'>{user.name}</h4>
+                      <span>Email: {user.email}</span>
+                      <span>Role: {user.role}</span>
+                    </div>
+                  </Link>
                 </li>  
               )
             }
