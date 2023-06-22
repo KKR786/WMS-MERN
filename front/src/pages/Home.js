@@ -508,12 +508,13 @@ export default React.memo(function Home() {
             </div>
           </div>
         </div>
-
+        {user.role==='Super-Admin' &&
         <div className="row mt-5">
           <div className="col-md-6">
             <PieChart data={totalMonthlyHours} month={selectedOption.label}/>
           </div>
         </div>
+}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
+import Pagination from "react-bootstrap/Pagination";
 import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
 
@@ -8,6 +9,8 @@ function Reports() {
   const { user } = useAuthContext();
   const [total, setTotal] = useState(0);
   const [error, setError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
 
   let newDate = new Date();
   const currentDate =
@@ -27,7 +30,7 @@ function Reports() {
     currentMonthFirstDate.toLocaleDateString("en-CA")
   );
   const [endDate, setEndDate] = useState(currentDate);
-  const [ticketId, setTicketId] = useState('')
+  const [ticketId, setTicketId] = useState("");
   const [domain, setDomain] = useState("");
   const [agency, setAgency] = useState("");
   const [type, setType] = useState("");
@@ -35,10 +38,9 @@ function Reports() {
   const [names, setNames] = useState([{}]);
   const [domains, setDomains] = useState([]);
   const [agencies, setAgencies] = useState([]);
-  const [users, setUsers] = useState([{}])
-  const [user_id, setUser_Id] = useState('')
-  const [savedTypes, setSaveTypes] = useState([])
-
+  const [users, setUsers] = useState([{}]);
+  const [user_id, setUser_Id] = useState("");
+  const [savedTypes, setSaveTypes] = useState([]);
 
   useEffect(() => {
     const fetchDomains = async () => {
@@ -58,25 +60,25 @@ function Reports() {
     if (user) {
       fetchDomains();
     }
-  },[user])
+  }, [user]);
 
   useEffect(() => {
     const fetchWorkTypes = async () => {
-        const res = await fetch('/api/system/work_types', {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        const json = await res.json();
-  
-        if (res.ok) {
-          const workTypes = json.map((data) => data.type);
-          setSaveTypes(workTypes)
-        }
-      };
-  
-      if (user) {
-        fetchWorkTypes();
+      const res = await fetch("/api/system/work_types", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        const workTypes = json.map((data) => data.type);
+        setSaveTypes(workTypes);
       }
-    }, [ user])
+    };
+
+    if (user) {
+      fetchWorkTypes();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (worklogs) {
@@ -92,7 +94,7 @@ function Reports() {
             headers: { Authorization: `Bearer ${user.token}` },
           });
           const json = await response.json();
-          
+
           if (response.ok) {
             usersData.push({ id: json.user._id, name: json.user.name });
           }
@@ -124,13 +126,14 @@ function Reports() {
             domain,
             agency,
             type,
-            user_id
+            user_id,
           }),
         });
 
         const data = await response.json();
-        
+
         if (response.ok) {
+          setCurrentPage(1);
           setReports(true);
           dispatch({ type: "GET_WORKLOGS", payload: data });
           const totalHours = data.reduce(
@@ -141,7 +144,7 @@ function Reports() {
           setError(false);
         } else if (response.status === 404) {
           setError(true);
-          setReports(true)
+          setReports(true);
         }
       } catch (error) {
         console.error(error);
@@ -149,18 +152,18 @@ function Reports() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchUsers = async () => {
-      const res = await fetch('/api/users', {
+      const res = await fetch("/api/users", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const json = await res.json();
 
       if (res.ok) {
-        const userList = json.map((data) => {return {
+        const userList = json.map((data) => ({
           name: data.name,
-          id: data._id
-        }});
+          id: data._id,
+        }));
         setUsers(userList);
       }
     };
@@ -168,7 +171,19 @@ function Reports() {
     if (user) {
       fetchUsers();
     }
-  }, [ user]);
+  }, [user]);
+
+  // Calculate the index of the first and last items for the current page
+  const startIndex = (currentPage - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  if (worklogs) {
+    console.log(worklogs.length, startIndex)
+    var displayedWorklogs = worklogs.slice(startIndex, endIndex);
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="section">
@@ -202,9 +217,12 @@ function Reports() {
           </div>
           <div className="report-item">
             <label>Domain:</label>
-            <Select 
-              placeholder = "Select Domain"
-              options = {[{ label: "--Select--" }, ...domains.map((domain) => ({ value: domain, label: domain }))]}
+            <Select
+              placeholder="Select Domain"
+              options={[
+                { label: "--Select--" },
+                ...domains.map((domain) => ({ value: domain, label: domain })),
+              ]}
               value={domains.find((obj) => obj.value === domain)}
               onChange={(e) => setDomain(e.value)}
               id="domain"
@@ -212,29 +230,38 @@ function Reports() {
           </div>
           <div className="report-item">
             <label>Agency:</label>
-            <Select 
-              placeholder = "Select Agency"
-              options = {[{ label: "--Select--" }, ...agencies.map((agency) => ({ value: agency, label:agency }))]}
-              value={agencies.find(obj => obj.value === agency)}
-              onChange = {(e) => setAgency(e.value)}
-              id = "agency"
+            <Select
+              placeholder="Select Agency"
+              options={[
+                { label: "--Select--" },
+                ...agencies.map((agency) => ({ value: agency, label: agency })),
+              ]}
+              value={agencies.find((obj) => obj.value === agency)}
+              onChange={(e) => setAgency(e.value)}
+              id="agency"
             />
           </div>
           <div className="report-item m-auto">
             <label>Work Type:</label>
-            <Select 
-              placeholder = "Select Work Type"
-              options = {[{label: "--Select--" }, ...savedTypes.map((type) => ({ value: type, label: type }))]}
-              value={savedTypes.find(obj => obj.value === type)}
-              onChange = {(e) => setType(e.value)}
-              id = "type"
+            <Select
+              placeholder="Select Work Type"
+              options={[
+                { label: "--Select--" },
+                ...savedTypes.map((type) => ({ value: type, label: type })),
+              ]}
+              value={savedTypes.find((obj) => obj.value === type)}
+              onChange={(e) => setType(e.value)}
+              id="type"
             />
           </div>
           <div className="report-item m-auto">
             <label>User:</label>
-            <Select 
-              placeholder = "Select User"
-              options = {[{ label: "--Select--" }, ...users.map((user) => ({ value: user.id, label: user.name }))]}
+            <Select
+              placeholder="Select User"
+              options={[
+                { label: "--Select--" },
+                ...users.map((user) => ({ value: user.id, label: user.name })),
+              ]}
               value={users.find((obj) => obj.value === user_id)}
               onChange={(e) => setUser_Id(e.value)}
               id="type"
@@ -244,13 +271,51 @@ function Reports() {
             <button className="btn-info">Generate</button>
           </div>
         </form>
+
         {reports && (
           <div className="my-4">
             <div>
-              <h5>
-                Total Hours:{" "} 
-               {total.toFixed(2)}
-              </h5>
+              <h5>Total Hours: {total.toFixed(2)}</h5>
+            </div>
+            <div className="d-flex align-items-center justify-content-between mb-3">
+              <div className="status">
+                <span>{`${startIndex + 1} - ${Math.min(endIndex, worklogs.length)} of ${worklogs.length}`}</span>
+              </div>
+              <div>
+                <Pagination>
+                  <Pagination.Prev
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  />
+                  {Array.from({
+                    length: Math.ceil(worklogs.length / perPage),
+                  }).map((page, index) => (
+                    <Pagination.Item
+                      key={index + 1}
+                      active={index + 1 === currentPage}
+                      onClick={() => handlePageChange(index + 1)}
+                    >
+                      {index + 1}
+                    </Pagination.Item>
+                  ))}
+                  <Pagination.Next
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === Math.ceil(worklogs.length / perPage)}
+                  />
+                </Pagination>
+              </div>
+              <div className="d-flex align-items-center">
+                <span className="mr-2">Records per page</span>
+                  <select value={perPage} onChange={(e) => setPerPage(e.target.value)}>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                  </select>
+              </div>
             </div>
             <table>
               <thead className="bg-info text-white">
@@ -260,7 +325,11 @@ function Reports() {
                   <th>Domain</th>
                   <th>Agency</th>
                   <th>Work Type</th>
-                  <th onClick={() => alert(`Total Hours: ${total.toFixed(2)}`)}>
+                  <th
+                    onClick={() =>
+                      alert(`Total Hours: ${total.toFixed(2)}`)
+                    }
+                  >
                     Hours
                   </th>
                   <th>User</th>
@@ -269,35 +338,34 @@ function Reports() {
               <tbody>
                 {!error ? (
                   <>
-                    {worklogs &&
-                      worklogs.map((worklog, i) => (
-                        <tr key={i} className="bg-light">
-                          <td>{worklog.date}</td>
-                          <td>
-                            <a
-                              href={"https://jupiterplatform.com/Tickets/edit.php?id=".concat(
-                                worklog.ticketId
-                              )}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              {worklog.ticketId}
-                            </a>
-                          </td>
-                          <td>{worklog.domain}</td>
-                          <td>{worklog.agency}</td>
-                          <td>{worklog.type}</td>
-                          <td>{(worklog.time / 60).toFixed(2)}</td>
-                          <td>
-                            {names.find((data) => data.id === worklog.user_id)
-                              ?.name || ""}
-                          </td>
-                        </tr>
-                      ))}
+                    {worklogs && displayedWorklogs && displayedWorklogs.map((worklog, i) => (
+                      <tr key={i} className="bg-light">
+                        <td>{worklog.date}</td>
+                        <td>
+                          <a
+                            href={`https://jupiterplatform.com/Tickets/edit.php?id=${worklog.ticketId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {worklog.ticketId}
+                          </a>
+                        </td>
+                        <td>{worklog.domain}</td>
+                        <td>{worklog.agency}</td>
+                        <td>{worklog.type}</td>
+                        <td>{(worklog.time / 60).toFixed(2)}</td>
+                        <td>
+                          {names.find((data) => data.id === worklog.user_id)
+                            ?.name || ""}
+                        </td>
+                      </tr>
+                    ))}
                   </>
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-danger">No Data Found.</td>
+                    <td colSpan="7" className="text-danger">
+                      No Data Found.
+                    </td>
                   </tr>
                 )}
               </tbody>

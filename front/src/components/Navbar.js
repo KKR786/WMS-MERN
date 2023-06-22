@@ -38,7 +38,7 @@ const Navbar = (props) => {
         >
           <nav className="navigation flex-column">
             <Link className="sidebar-brand" to="/">
-              <span className="align-middle">WMS</span>
+              <span className="align-middle">Herse WMS</span>
             </Link>
             <div className="scrollbar" id="scroll-style">
               <div className="force-overflow">

@@ -7,6 +7,11 @@
   --error: #e7195a;
 }
 
+/*pagination*/
+.pagination {
+  margin: 0;
+}
+
 /*Charts*/
 .VictoryContainer {
   height: 86%!important;
