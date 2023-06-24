@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useLogout } from "../hooks/useLogout";
@@ -86,6 +87,12 @@ export default function MyWorklog() {
             className="w-25 h5"
           />
         </div>
+        <div className="text-right">
+          <Link to='/worklog' className="add-link">
+            <span className="material-symbols-outlined mr-2">edit_note</span>
+              Work Entry
+          </Link>
+        </div>
         {loading ? (
           <p>loading..</p>
         ) : (
@@ -96,9 +103,12 @@ export default function MyWorklog() {
                   <p>No data to display.</p>
                 ) : (
                   <div>
-                    <h5 className="my-4">Total Hours: {total.toFixed(2)}</h5>
+                    <div className='d-flex justify-content-between'>
+                      <h5 className="my-4">Total Hours: {total.toFixed(2)}</h5>
+                      
+                    </div>
                     <table>
-                      <thead className="bg-info text-white">
+                      <thead className="text-white">
                         <tr>
                           <th>Date</th>
                           <th>Ticket ID</th>

@@ -21,7 +21,7 @@ function TopBar(props) {
     logout();
   };
   return (
-    <nav className="navbar navbar-expand bg-white topBar">
+    <nav className="navbar navbar-expand topBar">
       <div className="w-100 py-3">
         <div className="d-flex justify-content-between align-items-center w-100">
           <span className="material-symbols-outlined hamburger" onClick={hamburgerOnClick}>

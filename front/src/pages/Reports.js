@@ -318,7 +318,7 @@ function Reports() {
               </div>
             </div>
             <table>
-              <thead className="bg-info text-white">
+              <thead className="text-white">
                 <tr>
                   <th>Date</th>
                   <th>Ticket ID</th>

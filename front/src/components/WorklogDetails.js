@@ -71,7 +71,7 @@ const WorklogDetails = ({ worklogs, date }) => {
             </h4>
           </div>
           <table>
-            <thead className="bg-info text-white">
+            <thead className="text-white">
               <tr>
                 <th>Ticket ID</th>
                 <th>Domain</th>

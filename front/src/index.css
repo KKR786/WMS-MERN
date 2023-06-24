@@ -5,6 +5,11 @@
 :root {
   --primary: #1aac83;
   --error: #e7195a;
+  --secondary: #fe6161;
+}
+
+thead {
+  background-color: var(--primary);
 }
 
 /*pagination*/
@@ -55,17 +60,12 @@
 
 .active a,
 .show .nav-item.active a {
-    color: #0056b3;
+    color: #fff;
 }
 
 ul.dropdown-nav {
     list-style: none;
     padding-top: 5px;
-}
-
-.dropdown-nav .nav-item:hover {
-    background: rgb(138, 192, 56);
-    font-weight: 600;
 }
 
 .App {
@@ -105,10 +105,9 @@ ul.dropdown-nav {
 }
 .hamburger {
   cursor: pointer;
-  background: linear-gradient(to bottom right,#4be8d4,#129bd2);
   font-size: 40px;
   border-radius: 5px;
-  box-shadow: 0 2px 3px rgba(4,4,7,.1);
+  color: floralwhite;
 }
 .dropdown {
   position: relative;
@@ -137,16 +136,19 @@ ul.dropdown-nav {
   display: block;
   background: white;
     padding: 16px;
-    margin: 10px 0px 5px -35px;
+    margin: 10px 0px 5px 0px;
     width: max-content;
+    right: 1.5px;
 }
 
 .dropdown-content a {
   color: black;
 }
-
+a:hover {
+  color: #fff;
+}
 .dropdown-content a:hover, .dropdown-content button:hover {
-  background-color: #f1f1f1;
+  background-color: slateblue;
 }
 .content {
   width: 100%;
@@ -160,7 +162,7 @@ ul.dropdown-nav {
   padding: 0.7rem 1.2rem 0.7rem 0.7rem;
   color: #5c5555;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   cursor: pointer;
 }
@@ -241,6 +243,8 @@ body {
 /*TopBar*/
 .topBar {
   position: sticky;
+  background-color: slateblue;
+  color: #fff;
   top: 0px;
   z-index: 999;
   box-shadow: 0px 2px 5px rgb(0 0 0 / 17%);
@@ -264,23 +268,20 @@ body {
   padding: 1.5rem 1.5rem 0.375rem;
 }
 .nav-item:hover {
-  background: greenyellow;
+  background: slateblue;
   font-weight: 600;
 }
 .active {
-  background: greenyellow;
-}
-.active a {
-  color: #0056b3;
+  background: slateblue;
 }
 .nav-link {
   position: relative;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 500;
   line-height: 1.5;
   width: 100%;
   padding: 0.7rem 1.2rem 0.7rem 0.7rem;
-  color: #fff;
+  color: #fe6161;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -357,7 +358,12 @@ body {
   color: white;
   background-color: black!important;
 }
-.holiday-tooltip {
+.leaveDates {
+  list-style: none;
+  column-count: 2;
+  font-weight: 500;
+}
+.holiday-tooltip, .leaveDay-tooltip {
   position: absolute;
   visibility: hidden;
   background-color: #333;
@@ -368,7 +374,7 @@ body {
   white-space: nowrap;
 }
 
-.holiday-tile:hover .holiday-tooltip {
+.holiday-tile:hover .holiday-tooltip, .leaveDay-tile:hover .leaveDay-tooltip {
   visibility: visible;
 }
 
@@ -761,7 +767,7 @@ th {
   padding: 8px;
 }
 a {
-  text-decoration: none;
+  text-decoration: none!important;
 }
 
 
@@ -2047,7 +2053,7 @@ a {
   top: 0;
   width: 250px;
   height: 100%;
-  background-color: #2f3136;
+  background-color: black;
   overflow: hidden;
   color: #fff;
   padding: 20px 0px;

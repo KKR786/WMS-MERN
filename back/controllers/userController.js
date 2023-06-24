@@ -103,7 +103,7 @@ const takeLeave = async (req, res) => {
 const getLeave = async (req, res) => {
   const user_id = req.user._id
 
-  const leavedays = await Leave.find({user_id}).sort({createdAt: -1})
+  const leavedays = await Leave.find({user_id}).sort({leaveDate: -1})
 
   res.status(200).json(leavedays)
 }

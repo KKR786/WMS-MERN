@@ -92,10 +92,16 @@ console.log(leaveDays, holidays)
       const holiday = holidays.find(
         (holiday) => holiday.date.toDateString() === date.toDateString()
       );
-      
+      const leaveday = leaveDays.find((leaveDay) => leaveDay.date.toDateString() === date.toDateString());
       if (holiday) {
         return <span className="holiday-tooltip">{holiday.name}</span>;
       }
+    
+      if (leaveday) {
+        console.log(leaveday.name);
+        return <span className="leaveDay-tooltip">{leaveday.name}</span> ; 
+      }
+      
     }
     return null; 
   };
@@ -149,6 +155,10 @@ const handleDateChange = async (date) => {
       setLeaveForm(true);
     }
   };
+  if(leaveDays) {
+    leaveDays.map((leave, i) => {
+      console.log(leave.date.toDateString());
+    })}
 
   return (
     <div className="section">
@@ -196,7 +206,17 @@ const handleDateChange = async (date) => {
               tileClassName={tileClassName}
             />
         </div>
-        <h3 className="text-center mt-5">Total Leave: {totalLeave}</h3>
+        <div className="d-flex">
+          <div>
+            <h3 className="text-center mt-5">Total Leave: {totalLeave}</h3>
+            <ul className="leaveDates"> 
+            {leaveDays &&
+              leaveDays.map((leave, i) => (
+                  <li key={i}>{leave.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</li>
+              ))}
+            </ul>             
+          </div>
+        </div>
         </div>
     </div>
   )

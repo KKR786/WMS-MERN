@@ -37,55 +37,27 @@ const Navbar = (props) => {
           style={props.class ? { left: "0px" } : { left: "-250px" }}
         >
           <nav className="navigation flex-column">
-            <Link className="sidebar-brand" to="/">
+            <Link className="sidebar-brand mb-5" to="/">
               <span className="align-middle">Herse WMS</span>
             </Link>
             <div className="scrollbar" id="scroll-style">
               <div className="force-overflow">
                 <ul className="nav flex-column flex-nowrap" id="ulmenu">
-                  <li className="sidebar-header">Pages</li>
+                  {/* <li className="sidebar-header">Pages</li> */}
                   <li className={isLinkActive("/") ? "nav-item active" : "nav-item"}>
                     <Link className="nav-link" to="/" onClick={() => handleClick("/")}>
                       <span className="material-symbols-outlined mr-2">dashboard</span>
                       Dashboard
                     </Link>
                   </li>
-                  <li className={isLinkActive("/profile") ? "nav-item active" : "nav-item"}>
-                    <Link className="nav-link" to="/profile" onClick={() => handleClick("/profile")}>
-                      <span className="material-symbols-outlined mr-2">account_circle</span>
-                      Profile
+
+                  <li className={isLinkActive("/worklogs") ? "nav-item active" : "nav-item"}>
+                    <Link className="nav-link" to="/worklogs" onClick={() => handleClick("/worklogs")}>
+                      <span className="material-symbols-outlined mr-2">work_history</span>
+                      My Worklog
                     </Link>
                   </li>
-                  <li
-                    className={isLinkActive("/worklog") || isLinkActive("/worklogs") || secondNav === 'show'  ? "nav-item active" : "nav-item"}
-                  >
-                    <div
-                      className="nav-link justify-content-between"
-                      onClick={() => setSecondNav("show")}
-                    >
-                      <div className='d-flex'>
-                        <span className="material-symbols-outlined mr-2">receipt_long</span>
-                        Worklog
-                      </div>
-                      <span className="material-symbols-outlined">
-                        arrow_drop_down
-                      </span>
-                    </div>
-                    <ul className={`dropdown-nav pl-3 ${secondNav}`}>
-                      <li className={isLinkActive("/worklog") ? "nav-item active" : "nav-item"}>
-                        <Link className="nav-link" to="/worklog" onClick={() => handleClick("/worklog")}>
-                          <span className="material-symbols-outlined mr-2">edit_note</span>
-                          Work Entry
-                        </Link>
-                      </li>
-                      <li className={isLinkActive("/worklogs") ? "nav-item active" : "nav-item"}>
-                        <Link className="nav-link" to="/worklogs" onClick={() => handleClick("/worklogs")}>
-                          <span className="material-symbols-outlined mr-2">work_history</span>
-                          My Worklog
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
+
                   <li className={isLinkActive("/leave-plan") ? "nav-item active" : "nav-item"}>
                     <Link className="nav-link" to="/leave-plan" onClick={() => handleClick("/leave-plan")}>
                       <span className="material-symbols-outlined mr-2">calendar_month</span>
