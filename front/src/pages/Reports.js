@@ -173,7 +173,7 @@ function Reports() {
     }
   }, [user]);
 
-  // Calculate the index of the first and last items for the current page
+  // pagination
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = startIndex + perPage;
   if (worklogs) {
@@ -184,6 +184,78 @@ function Reports() {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+
+  const renderPaginationItems = () => {
+    const totalPages = Math.ceil(worklogs.length / perPage);
+    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    if (totalPages <= 1) {
+      return null;
+    }
+
+    const showEllipsis = totalPages > 5;
+
+    if (!showEllipsis) {
+      return pageNumbers.map((pageNumber) => (
+        <Pagination.Item
+          key={pageNumber}
+          onClick={() => handlePageChange(pageNumber)}
+          className={currentPage === pageNumber ? "active" : ""}
+        >
+          {pageNumber}
+        </Pagination.Item>
+      ));
+    }
+
+    const ellipsisStart = Math.max(currentPage - 2, 2);
+    const ellipsisEnd = Math.min(currentPage + 2, totalPages - 1);
+
+    const pageItems = [];
+
+    pageItems.push(
+      <Pagination.Item
+        key={1}
+        onClick={() => handlePageChange(1)}
+        className={currentPage === 1 ? "active" : ""}
+      >
+        1
+      </Pagination.Item>
+    );
+
+    if (ellipsisStart > 2) {
+      pageItems.push(<Pagination.Ellipsis key="start" />);
+    }
+
+    for (let i = ellipsisStart; i <= ellipsisEnd; i++) {
+      pageItems.push(
+        <Pagination.Item
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={currentPage === i ? "active" : ""}
+        >
+          {i}
+        </Pagination.Item>
+      );
+    }
+
+    if (ellipsisEnd < totalPages - 1) {
+      pageItems.push(<Pagination.Ellipsis key="end" />);
+    }
+
+    pageItems.push(
+      <Pagination.Item
+        key={totalPages}
+        onClick={() => handlePageChange(totalPages)}
+        className={currentPage === totalPages ? "active" : ""}
+      >
+        {totalPages}
+      </Pagination.Item>
+    );
+
+    return pageItems;
+  };
+
+
 
   return (
     <div className="section">
@@ -277,44 +349,39 @@ function Reports() {
             <div>
               <h5>Total Hours: {total.toFixed(2)}</h5>
             </div>
-            <div className="d-flex align-items-center justify-content-between mb-3">
+            <div className="d-flex align-items-center justify-content-between mb-2">
               <div className="status">
                 <span>{`${startIndex + 1} - ${Math.min(endIndex, worklogs.length)} of ${worklogs.length}`}</span>
               </div>
               <div>
+              {renderPaginationItems() != null &&
                 <Pagination>
                   <Pagination.Prev
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                   />
-                  {Array.from({
-                    length: Math.ceil(worklogs.length / perPage),
-                  }).map((page, index) => (
-                    <Pagination.Item
-                      key={index + 1}
-                      active={index + 1 === currentPage}
-                      onClick={() => handlePageChange(index + 1)}
-                    >
-                      {index + 1}
-                    </Pagination.Item>
-                  ))}
+                  {renderPaginationItems()}
                   <Pagination.Next
                     onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === Math.ceil(worklogs.length / perPage)}
+                    disabled={
+                      currentPage ===
+                      Math.ceil(worklogs.length / perPage)
+                    }
                   />
                 </Pagination>
+              }
               </div>
               <div className="d-flex align-items-center">
                 <span className="mr-2">Records per page</span>
-                  <select value={perPage} onChange={(e) => setPerPage(e.target.value)}>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                    <option value="500">500</option>
-                    <option value="1000">1000</option>
-                  </select>
+                <select value={perPage} onChange={(e) => setPerPage(e.target.value)}>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="200">200</option>
+                  <option value="500">500</option>
+                  <option value="1000">1000</option>
+                </select>
               </div>
             </div>
             <table>
@@ -333,6 +400,7 @@ function Reports() {
                     Hours
                   </th>
                   <th>User</th>
+                  <th>Note</th>
                 </tr>
               </thead>
               <tbody>
@@ -358,6 +426,7 @@ function Reports() {
                           {names.find((data) => data.id === worklog.user_id)
                             ?.name || ""}
                         </td>
+                        <td>{worklog.note}</td>
                       </tr>
                     ))}
                   </>

@@ -98,7 +98,7 @@ const Navbar = (props) => {
               </div>
             </div>
             <button
-              className="nav-link mb-4 bg-transparent logoutBtn"
+              className="nav-link mb-4 logoutBtn"
               onClick={logout}
             >
               <span className="material-symbols-outlined mr-2">logout</span>

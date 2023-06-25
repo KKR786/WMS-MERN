@@ -5,6 +5,8 @@ import { useAuthContext } from "../hooks/useAuthContext";
 
 function LeavePlan() {
   const { user } = useAuthContext();
+  const [userIds, setUserIds] = React.useState([])
+  const [names, setNames] = React.useState([{}])
   const [leaveForm, setLeaveForm] = React.useState(false)
   const [leaveTitle, setLeaveTitle] = React.useState("");
   const [error, setError] = React.useState(null);
@@ -16,62 +18,103 @@ function LeavePlan() {
   const [selectedDate, setSelectedDate] = React.useState(date);
 
   React.useEffect(() => {
-    const fetchHolidays = async() => {
-    const res = await fetch("/api/system/holidays", {
-       headers: { Authorization: `Bearer ${user.token}` }
-       });
- 
-       const json = await res.json();
-       if(res.ok) {
-         // json.map((d) => {
-         //   console.log(new Date(d.date).toLocaleString('en-ca', {dateStyle: 'short'}));
-         // })
-         setHolidays([...holidays, ...json.map((day) => ({ date: new Date(day.date), name: day.title}))])
-       }
-     }
-     if (user) {
-       fetchHolidays();
-     }
-   },[user]);
+    const fetchHolidays = async () => {
+      const res = await fetch("/api/system/holidays", {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
 
-   React.useEffect(() => {
-    const fetchLeavedays = async() => {
-     const res = await fetch("/api/user/leaves", {
-       headers: { Authorization: `Bearer ${user.token}` }
-       });
- 
-       const json = await res.json();
-       if(res.ok) {
-        setLeaveDays([...leaveDays, ...json.map((day) => ({ date: new Date(day.leaveDate), name: day.leaveTitle}))])
-       }
-     }
-     if (user) {
-       fetchLeavedays();
-     }
-   },[user]);
+      const json = await res.json();
+      if (res.ok) {
+        // json.map((d) => {
+        //   console.log(new Date(d.date).toLocaleString('en-ca', {dateStyle: 'short'}));
+        // })
+        setHolidays([...holidays, ...json.map((day) => ({ date: new Date(day.date), name: day.title }))])
+      }
+    }
+    if (user) {
+      fetchHolidays();
+    }
+  }, [user]);
 
-   React.useEffect(() => {
-        const leavesCount = leaveDays.filter((leave) => {
-        const leaveDate = new Date(leave.date);
-        const current = new Date()
-        const currentYear = current.getFullYear();
-        const currentMonth = current.getMonth() + 1;
-        console.log(currentMonth)
-        
-        const julyFirst = currentMonth < 7 ? new Date(`${currentYear-1}-07-01`) : new Date(`${currentYear}-07-01`);
-        const nextJune = currentMonth < 7 ? new Date(`${currentYear}-06-30`) : new Date(`${currentYear+1}-06-30`);
+  React.useEffect(() => {
+    const userOnLeave = async () => {
+      const res = await fetch(`/api/user/leave/day?date=${selectedDate.toLocaleDateString('en-CA')}`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+
+      const json = await res.json();
+      console.log(json.user_id)
+      if(res.ok) {
+        setUserIds(json.map((l) => l.user_id));
+      }
+    }
+    if (user) {
+      userOnLeave();
+    }
+  }, [user, selectedDate])
+console.log(userIds)
+
+React.useEffect(() => {
+  if (userIds) {
     
-        return leaveDate >= julyFirst && leaveDate <= nextJune;
-      }).length;
-      setTotalLeave(leavesCount);
-   }, [leaveDays])
-   
-   
-console.log(leaveDays, holidays)
+    const usersData = [];
+
+    // use Promise.all to wait for all the fetch calls to complete
+    Promise.all(
+      userIds.map(async (userId) => {
+        const response = await fetch(`/api/users/unique?_id=${userId}`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const json = await response.json();
+
+        if (response.ok) {
+          usersData.push({ id: json.user._id, name: json.user.name });
+        }
+      })
+    ).then(() => {
+      setNames(usersData);
+    });
+  }
+}, [userIds, user]);
+console.log(names)
+  React.useEffect(() => {
+    const fetchLeavedays = async () => {
+      const res = await fetch("/api/user/leaves", {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+
+      const json = await res.json();
+      if (res.ok) {
+        setLeaveDays([...leaveDays, ...json.map((day) => ({ date: new Date(day.leaveDate), name: day.leaveTitle }))])
+      }
+    }
+    if (user) {
+      fetchLeavedays();
+    }
+  }, [user]);
+
+  React.useEffect(() => {
+    const leavesCount = leaveDays.filter((leave) => {
+      const leaveDate = new Date(leave.date);
+      const current = new Date()
+      const currentYear = current.getFullYear();
+      const currentMonth = current.getMonth() + 1;
+      console.log(currentMonth)
+
+      const julyFirst = currentMonth < 7 ? new Date(`${currentYear - 1}-07-01`) : new Date(`${currentYear}-07-01`);
+      const nextJune = currentMonth < 7 ? new Date(`${currentYear}-06-30`) : new Date(`${currentYear + 1}-06-30`);
+
+      return leaveDate >= julyFirst && leaveDate <= nextJune;
+    }).length;
+    setTotalLeave(leavesCount);
+  }, [leaveDays])
+
+
+  console.log(leaveDays, holidays)
   console.log(totalLeave)
 
-   const tileClassName = ({ date, view }) => {
-    
+  const tileClassName = ({ date, view }) => {
+
     if (
       view === "month" &&
       holidays.find((holiday) => holiday.date.toDateString() === date.toDateString())
@@ -79,14 +122,14 @@ console.log(leaveDays, holidays)
       return "holiday-tile";
     }
     else if (
-        view === "month" &&
-        leaveDays.find((leaveDay) => leaveDay.date.toDateString() === date.toDateString())
-      ) {
-        return "leaveDay-tile";
-      }
+      view === "month" &&
+      leaveDays.find((leaveDay) => leaveDay.date.toDateString() === date.toDateString())
+    ) {
+      return "leaveDay-tile";
+    }
     return null;
   };
-  
+
   const tileContent = ({ date, view }) => {
     if (view === "month") {
       const holiday = holidays.find(
@@ -96,14 +139,14 @@ console.log(leaveDays, holidays)
       if (holiday) {
         return <span className="holiday-tooltip">{holiday.name}</span>;
       }
-    
+
       if (leaveday) {
         console.log(leaveday.name);
-        return <span className="leaveDay-tooltip">{leaveday.name}</span> ; 
+        return <span className="leaveDay-tooltip">{leaveday.name}</span>;
       }
-      
+
     }
-    return null; 
+    return null;
   };
 
   const leaveSubmit = async (e) => {
@@ -111,40 +154,40 @@ console.log(leaveDays, holidays)
     e.preventDefault();
 
     if (!user) {
-        setError("You must be logged in");
-        return;
-      }
+      setError("You must be logged in");
+      return;
+    }
     const leaveDate = new Date(selectedDate).toISOString().slice(0, 10);
     console.log(leaveDate);
     const leaveDay = { leaveDate, leaveTitle }
-    const res = await fetch('/api/user/leave', { 
-        method: 'POST',
-        body: JSON.stringify(leaveDay),
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${user.token}`
-        }
+    const res = await fetch('/api/user/leave', {
+      method: 'POST',
+      body: JSON.stringify(leaveDay),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`
+      }
     });
     const json = await res.json();
     if (!res.ok) {
-    setError(json.error);
-    setSuccess('')
+      setError(json.error);
+      setSuccess('')
     }
     if (res.ok) {
-        setSelectedDate("");
-        setLeaveTitle('')
-        setSuccess("Leave added successfully!");
-        setError('')
+      setSelectedDate("");
+      setLeaveTitle('')
+      setSuccess("Leave added successfully!");
+      setError('')
     }
-}
+  }
 
 
-const handleDateChange = async (date) => {
+  const handleDateChange = async (date) => {
     const selectedDate = new Date(
       Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
     );
     setSelectedDate(selectedDate);
-  
+
     if (
       !(holidays.find(
         (holiDay) => holiDay.date.toDateString() === selectedDate.toDateString()
@@ -155,69 +198,81 @@ const handleDateChange = async (date) => {
       setLeaveForm(true);
     }
   };
-  if(leaveDays) {
+  if (leaveDays) {
     leaveDays.map((leave, i) => {
       console.log(leave.date.toDateString());
-    })}
+    })
+  }
 
   return (
     <div className="section">
-        <div className="container">
+      <div className="container">
         {
-            leaveForm && (
+          leaveForm && (
             <div className="form-popup m-auto">
-            <span
-              className="float-right top-0 cancel"
-              onClick={() => {setLeaveForm(false);setSuccess("");
-              setError('')}}
-            >
-              X
-            </span>
-            <h3 className="text-center">Add Leave</h3>
-            <form
-              className="d-flex flex-wrap justify-content-between mt-5"
-              onSubmit={leaveSubmit}
-            >
-              <div className="agency-input">
-                <label>Note for Leave:</label>
-                <input
-                  type="text"
-                  onChange={(e) => setLeaveTitle(e.target.value)}
-                  value={leaveTitle}
-                />
-              </div>
-              <div className="d-flex align-items-center">
-                <button className="updateBtn">Leave</button>
-              </div>
-              {error && <div className="error">{error}</div>}
-            </form>
-            {success && <div className="success">{success}</div>}
-          </div>
-        )}
+              <span
+                className="float-right top-0 cancel"
+                onClick={() => {
+                  setLeaveForm(false); setSuccess("");
+                  setError('')
+                }}
+              >
+                X
+              </span>
+              <h3 className="text-center">Add Leave</h3>
+              <form
+                className="d-flex flex-wrap justify-content-between mt-5"
+                onSubmit={leaveSubmit}
+              >
+                <div className="agency-input">
+                  <label>Note for Leave:</label>
+                  <input
+                    type="text"
+                    onChange={(e) => setLeaveTitle(e.target.value)}
+                    value={leaveTitle}
+                  />
+                </div>
+                <div className="d-flex align-items-center">
+                  <button className="updateBtn">Leave</button>
+                </div>
+                {error && <div className="error">{error}</div>}
+              </form>
+              {success && <div className="success">{success}</div>}
+            </div>
+          )}
 
         <h1 className="my-5 text-center">
           Yearly Calendar
         </h1>
         <div className="d-flex justify-content-center">
-            <Calendar
-              value={selectedDate}
-              onChange={handleDateChange}
-              tileContent={tileContent}
-              tileClassName={tileClassName}
-            />
+          <Calendar
+            value={selectedDate}
+            onChange={handleDateChange}
+            tileContent={tileContent}
+            tileClassName={tileClassName}
+          />
         </div>
-        <div className="d-flex">
-          <div>
-            <h3 className="text-center mt-5">Total Leave: {totalLeave}</h3>
-            <ul className="leaveDates"> 
-            {leaveDays &&
-              leaveDays.map((leave, i) => (
+        <div className="row mt-5">
+          <div className="col-md-6 leave-box">
+            <h3 className="text-center my-4">Total Leave: {totalLeave}</h3>
+            <ul className={leaveDays.length >= 6 ? 'arrow-list count-2' : 'arrow-list'}>
+              {leaveDays &&
+                leaveDays.map((leave, i) => (
                   <li key={i}>{leave.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</li>
-              ))}
-            </ul>             
+                ))}
+            </ul>
+          </div>
+          <div className="col-md-6 leave-box">
+            <h3 className="text-center my-4">Todays on Leave</h3>
+            {names &&
+              <ul className={names.length >= 6 ? 'arrow-list count-2' : 'arrow-list'}>
+                {names.map((name, i) => (
+                  <li key={i}>{name.name}</li>))}
+              </ul>
+            }
           </div>
         </div>
-        </div>
+      </div>
     </div>
   )
 }

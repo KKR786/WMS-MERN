@@ -3,10 +3,11 @@
 
 /* layout */
 :root {
-  --primary: #1aac83;
+  --primary: darkgreen;
   --error: #e7195a;
   --secondary: #fe6161;
 }
+
 
 thead {
   background-color: var(--primary);
@@ -125,7 +126,9 @@ ul.dropdown-nav {
   background: white;
   width: 100%;
 }
-
+.dropbtn:hover {
+  color: #fff;
+}
 .dropdown-content {
   display: none;
   position: absolute;
@@ -136,7 +139,7 @@ ul.dropdown-nav {
   display: block;
   background: white;
     padding: 16px;
-    margin: 10px 0px 5px 0px;
+    margin: 30px -16px 0px 0px;
     width: max-content;
     right: 1.5px;
 }
@@ -146,6 +149,9 @@ ul.dropdown-nav {
 }
 a:hover {
   color: #fff;
+}
+td a:hover {
+  color: blueviolet;
 }
 .dropdown-content a:hover, .dropdown-content button:hover {
   background-color: slateblue;
@@ -160,15 +166,16 @@ a:hover {
   font-weight: 500;
   line-height: 1.5;
   padding: 0.7rem 1.2rem 0.7rem 0.7rem;
-  color: #5c5555;
-  text-decoration: none;
+  border: 1px solid seashell;
+  border-radius: 5px;
+  background-color: var(--primary);
+  color: white;
   display: inline-flex;
   align-items: center;
   cursor: pointer;
 }
 .add-link:hover {
-  color: #1aac83;
-  text-decoration: none;
+  background-color: slateblue;
 }
 .add-link span {
   font-size: 28px
@@ -184,7 +191,10 @@ a:hover {
   border: 1px solid gray;
   display: flex;
   flex-direction: column;
-  background: yellowgreen;
+  background: darkblue;
+}
+.list-unstyled a {
+  color: white;
 }
 body {
   background: #f1f1f1;
@@ -290,9 +300,13 @@ body {
 .logoutBtn {
   position: absolute;
   bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
   width: auto;
+  background-color: black;
+  border: none;
+}
+.logoutBtn:hover {
+  background-color: slateblue;
+  color: #fff;
 }
 /* homepage */
 .section {
@@ -358,10 +372,35 @@ body {
   color: white;
   background-color: black!important;
 }
-.leaveDates {
-  list-style: none;
-  column-count: 2;
+
+.leave-box {
+  border: 1px solid var(--primary);
+  background-color: khaki;
+}
+
+.arrow-list {
+  list-style-type: none;
   font-weight: 500;
+}
+
+.arrow-list li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  padding-left: 30px; /* Adjust the padding as needed */
+}
+
+.arrow-list li::before {
+  content: '\2192'; /* Left arrow HTML entity: &larr; */
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.count-2 {
+  column-count: 2;
 }
 .holiday-tooltip, .leaveDay-tooltip {
   position: absolute;
@@ -500,13 +539,13 @@ body {
   max-width: 100%;
 }
 .entry button {
-  background: #66afe9;
+  background: var(--primary);
   font-size: 16px;
   margin-top: 35px;
-  border: 1px solid #2f3136;
+  font-weight: 500;
 }
 .entry button:hover {
-  background-color: #1877f2;
+  background-color: slateblue;
 }
 .reEntry:nth-child(1),
 .reEntry:nth-child(4) {
@@ -720,7 +759,7 @@ nav button {
 }
 
 /* auth forms */
-form.signup,
+/* form.signup, */
 form.login {
   max-width: 400px;
   margin: 40px auto;
@@ -735,14 +774,14 @@ form.login {
   align-items: center !important;
   justify-content: center;
 }
-.addAccountBtn {
+/* .addAccountBtn {
   font-weight: bold;
   background: #42b72a;
 }
 .addAccountBtn:hover {
   background-color: #36a420;
   border-color: #36a420;
-}
+} */
 input[type="file"] {
   cursor: pointer;
 }
@@ -785,7 +824,7 @@ a {
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
   border-radius: 10px;
 }
-.signup-box {
+/* .signup-box {
   color: white;
   width: 460px;
   padding: 15px 40px;
@@ -794,15 +833,8 @@ a {
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
   border-radius: 10px;
   margin: 0 auto;
-}
-
-/* .login-box .user-box input:focus ~ label,
-.login-box .user-box input:valid ~ label {
-  top: -20px;
-  left: 0;
-  color: #03e9f4;
-  font-size: 12px;
 } */
+
 
 /* Animation Css */
 .bg-animation {
@@ -1995,34 +2027,6 @@ a {
   }
 }
 
-/*VeiwWorklog*/
-.month-box button {
-  background-color: #04aa6d; /* Green background */
-  border: 1px solid green; /* Green border */
-  color: white; /* White text */
-  padding: 10px 24px; /* Some padding */
-  cursor: pointer; /* Pointer/hand icon */
-  float: left; /* Float the buttons side by side */
-  width: 8.33%;
-  height: 50px;
-  font-size: 20px;
-}
-
-/* Clear floats (clearfix hack) */
-.month-box:after {
-  content: "";
-  clear: both;
-  display: table;
-}
-
-.month-box button:not(:last-child) {
-  border-right: none; /* Prevent double borders */
-}
-
-/* Add a background color on hover */
-.month-box button:hover {
-  background-color: #3e8e41;
-}
 
 /* pop-up */
 .form-popup {
@@ -2068,4 +2072,80 @@ li {
 
 li:last-child {
   margin-bottom: 0;
+}
+
+.signup-box {
+  width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.signup {
+  display: flex;
+  flex-direction: column;
+}
+
+.signup h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.signup label {
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.signup input,
+.signup select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.signup .select-role {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.signup .addAccount {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.signup .addAccountBtn {
+  padding: 10px 20px;
+  background-color: #ff6f00;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.signup .addAccountBtn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.signup .addAccountBtn:hover {
+  background-color: #ff812b;
+}
+
+.signup .error {
+  color: red;
+  margin-top: 10px;
+  text-align: center;
 }

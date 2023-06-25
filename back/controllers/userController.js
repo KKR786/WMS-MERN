@@ -107,5 +107,12 @@ const getLeave = async (req, res) => {
 
   res.status(200).json(leavedays)
 }
+const todaysOnLeave = async (req, res) => {
+  const date = req.query.date;
 
-module.exports = { signupUser, loginUser, updateUserProfile, getUsers, getUser, takeLeave, getLeave }
+  const usersOnLeave = await Leave.find({leaveDate: date})
+
+  res.status(200).json(usersOnLeave)
+}
+
+module.exports = { signupUser, loginUser, updateUserProfile, getUsers, getUser, takeLeave, getLeave, todaysOnLeave }

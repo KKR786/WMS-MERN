@@ -12,7 +12,7 @@ const {
 
 const { getHoliDays, getAllDomains, getWorkTypes } = require('../controllers/systemController')
 
-const { takeLeave, getLeave } = require('../controllers/userController')
+const { takeLeave, getLeave, todaysOnLeave } = require('../controllers/userController')
 
 const requireAuth = require('../middleware/requireAuth')
 
@@ -24,6 +24,7 @@ router.use(requireAuth)
 //leave
 router.post('/user/leave', takeLeave)
 router.get('/user/leaves', getLeave)
+router.get('/user/leave/day', todaysOnLeave)
 
 //Get systems
 router.get('/system/holidays', getHoliDays)

@@ -4,6 +4,7 @@ import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useLogout } from "../hooks/useLogout";
 import Select from "react-select";
+import Pagination from "react-bootstrap/Pagination";
 
 export default function MyWorklog() {
   const { monthlyWorklogs, dispatch } = useWorklogsContext();
@@ -12,6 +13,8 @@ export default function MyWorklog() {
 
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
 
   const options = [];
   const startDate = new Date(user.joiningDate);
@@ -24,9 +27,8 @@ export default function MyWorklog() {
   ) {
     const monthLabel = currentDate.toLocaleString("default", { month: "long" });
     const yearLabel = currentDate.getFullYear();
-    const optionValue = `${
-      currentDate.getMonth() + 1
-    }-${currentDate.getFullYear()}`;
+    const optionValue = `${currentDate.getMonth() + 1
+      }-${currentDate.getFullYear()}`;
     const optionLabel = `${monthLabel} ${yearLabel}`;
     options.push({ value: optionValue, label: optionLabel });
     currentDate.setMonth(currentDate.getMonth() + 1);
@@ -74,6 +76,88 @@ export default function MyWorklog() {
     }
   }, [dispatch, user, selectedMonth]);
 
+  // pagination
+  const startIndex = (currentPage - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  if (monthlyWorklogs) {
+    console.log(monthlyWorklogs.length, startIndex)
+    var displayedWorklogs = monthlyWorklogs.slice(startIndex, endIndex);
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const renderPaginationItems = () => {
+    const totalPages = Math.ceil(monthlyWorklogs.length / perPage);
+    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    if (totalPages <= 1) {
+      return null;
+    }
+
+    const showEllipsis = totalPages > 5;
+
+    if (!showEllipsis) {
+      return pageNumbers.map((pageNumber) => (
+        <Pagination.Item
+          key={pageNumber}
+          onClick={() => handlePageChange(pageNumber)}
+          className={currentPage === pageNumber ? "active" : ""}
+        >
+          {pageNumber}
+        </Pagination.Item>
+      ));
+    }
+
+    const ellipsisStart = Math.max(currentPage - 2, 2);
+    const ellipsisEnd = Math.min(currentPage + 2, totalPages - 1);
+
+    const pageItems = [];
+
+    pageItems.push(
+      <Pagination.Item
+        key={1}
+        onClick={() => handlePageChange(1)}
+        className={currentPage === 1 ? "active" : ""}
+      >
+        1
+      </Pagination.Item>
+    );
+
+    if (ellipsisStart > 2) {
+      pageItems.push(<Pagination.Ellipsis key="start" />);
+    }
+
+    for (let i = ellipsisStart; i <= ellipsisEnd; i++) {
+      pageItems.push(
+        <Pagination.Item
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={currentPage === i ? "active" : ""}
+        >
+          {i}
+        </Pagination.Item>
+      );
+    }
+
+    if (ellipsisEnd < totalPages - 1) {
+      pageItems.push(<Pagination.Ellipsis key="end" />);
+    }
+
+    pageItems.push(
+      <Pagination.Item
+        key={totalPages}
+        onClick={() => handlePageChange(totalPages)}
+        className={currentPage === totalPages ? "active" : ""}
+      >
+        {totalPages}
+      </Pagination.Item>
+    );
+
+    return pageItems;
+  };
+
   return (
     <div className="section">
       <div className="container">
@@ -90,7 +174,7 @@ export default function MyWorklog() {
         <div className="text-right">
           <Link to='/worklog' className="add-link">
             <span className="material-symbols-outlined mr-2">edit_note</span>
-              Work Entry
+            Work Entry
           </Link>
         </div>
         {loading ? (
@@ -103,9 +187,40 @@ export default function MyWorklog() {
                   <p>No data to display.</p>
                 ) : (
                   <div>
-                    <div className='d-flex justify-content-between'>
-                      <h5 className="my-4">Total Hours: {total.toFixed(2)}</h5>
-                      
+                    <h5 className="my-4">Total Hours: {total.toFixed(2)}</h5>
+                    <div className='d-flex justify-content-between align-items-center mb-2'>
+                      <div className="status">
+                        <span>{`${startIndex + 1} - ${Math.min(endIndex, monthlyWorklogs.length)} of ${monthlyWorklogs.length}`}</span>
+                      </div>
+                      <div>
+                        {renderPaginationItems() != null &&
+                        <Pagination>
+                          <Pagination.Prev
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                          />
+                          {renderPaginationItems()}
+                          <Pagination.Next
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={
+                              currentPage ===
+                              Math.ceil(monthlyWorklogs.length / perPage)
+                            }
+                          />
+                        </Pagination>}
+                      </div>
+                      <div className="d-flex align-items-center">
+                        <span className="mr-2">Records per page</span>
+                        <select value={perPage} onChange={(e) => setPerPage(e.target.value)}>
+                          <option value="10">10</option>
+                          <option value="25">25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                          <option value="200">200</option>
+                          <option value="500">500</option>
+                          <option value="1000">1000</option>
+                        </select>
+                      </div>
                     </div>
                     <table>
                       <thead className="text-white">
@@ -119,8 +234,8 @@ export default function MyWorklog() {
                         </tr>
                       </thead>
                       <tbody>
-                        {monthlyWorklogs &&
-                          Object.values(monthlyWorklogs).map((worklog, i) => (
+                        {monthlyWorklogs && displayedWorklogs &&
+                          Object.values(displayedWorklogs).map((worklog, i) => (
                             <tr key={i} className="bg-light">
                               <td>{worklog.date}</td>
                               <td>
