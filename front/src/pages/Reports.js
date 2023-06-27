@@ -3,6 +3,7 @@ import Select from "react-select";
 import Pagination from "react-bootstrap/Pagination";
 import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
+import ExportAsPDF from "../components/ExportAsPDF";
 
 function Reports() {
   const { worklogs, dispatch } = useWorklogsContext();
@@ -255,8 +256,30 @@ function Reports() {
     return pageItems;
   };
 
-
-
+  //pdf doc
+  const columns = [
+    "Date",
+    "Ticket ID",
+    "Domain",
+    "Agency",
+    "Work Type",
+    "Hours",
+    "User",
+    "Note"
+  ];
+  if(worklogs) {
+  var rows = worklogs.map((worklog) => [
+    worklog.date,
+    worklog.ticketId,
+    worklog.domain,
+    worklog.agency,
+    worklog.type,
+    (worklog.time / 60).toFixed(2),
+    names.find((data) => data.id === worklog.user_id)?.name || "",
+    worklog.note
+  ]);}
+console.log(rows);
+console.log(columns)
   return (
     <div className="section">
       <div className="container">
@@ -346,8 +369,9 @@ function Reports() {
 
         {reports && (
           <div className="my-4">
-            <div>
+            <div className="d-flex justify-content-between">
               <h5>Total Hours: {total.toFixed(2)}</h5>
+              <ExportAsPDF rows={rows} columns={columns}/>
             </div>
             <div className="d-flex align-items-center justify-content-between mb-2">
               <div className="status">
