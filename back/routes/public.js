@@ -12,7 +12,7 @@ const {
 
 const { getHoliDays, getAllDomains, getWorkTypes } = require('../controllers/systemController')
 
-const { takeLeave, getLeave, todaysOnLeave } = require('../controllers/userController')
+const { updateUserProfile, updateUserPassword, takeLeave, getLeave, todaysOnLeave } = require('../controllers/userController')
 
 const requireAuth = require('../middleware/requireAuth')
 
@@ -20,6 +20,10 @@ const router = express.Router()
 
 // middleware
 router.use(requireAuth)
+
+//update user info
+router.patch('/user/profile/:_id', updateUserProfile)
+router.patch('/user/change_password/:_id', updateUserPassword)
 
 //leave
 router.post('/user/leave', takeLeave)

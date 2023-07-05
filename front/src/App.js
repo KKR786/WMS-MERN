@@ -15,7 +15,6 @@ import Profile from "./pages/Profile";
 import UsersProfile from "./pages/UsersProfile";
 import ManageUsers from "./pages/ManageUsers";
 import SystemSettings from "./pages/SystemSettings";
-import ManageRoles from "./pages/ManageRoles";
 import MyWorklog from "./pages/MyWorklog";
 
 
@@ -64,10 +63,6 @@ function App() {
               <Route
                 path="/system-settings"
                 element={user ? (user.role === 'Super-Admin' ? <SystemSettings /> : <Navigate to="/login" />) : <Navigate to="/login" />}
-              />
-              <Route
-                path="/role-management"
-                element={user ? (user.role === 'Super-Admin' ? <ManageRoles /> : <Navigate to="/login" />) : <Navigate to="/login" />}
               />
               <Route
                 path="/users"

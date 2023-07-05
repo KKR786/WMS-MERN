@@ -4,7 +4,7 @@ import { useAuthContext } from './useAuthContext'
 export const useSignup = () => {
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(null)
-  const { dispatch } = useAuthContext()
+  const { user, dispatch } = useAuthContext()
 
   const signup = async (email, name, role, password) => {
     setIsLoading(true)
@@ -12,7 +12,8 @@ export const useSignup = () => {
 
     const response = await fetch('/api/protected/user/signup', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: { Authorization: `Bearer ${user.token}`,
+        'Content-Type': 'application/json'},
       body: JSON.stringify({ email, name, role, password })
     })
     const json = await response.json()

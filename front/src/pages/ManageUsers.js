@@ -36,17 +36,17 @@ function ManageUsers() {
           </Link>
         </div>
         <div className="mt-5 pr-5">
-          <ul className="list-unstyled">
+          <ul className="users-list">
             {users &&
               users.map((user, i) =>
                 <li key={i}>
-                  <Link to={`/user/profile/${user._id}`}>
                     <div className="user-card">
-                      <h4 className='h3'>{user.name}</h4>
+                      <Link to={`/user/profile/${user._id}`}>
+                        <h4 className='h3'>{user.name}</h4>
+                      </Link>
                       <span>Email: {user.email}</span>
                       <span>Role: {user.role}</span>
                     </div>
-                  </Link>
                 </li>  
               )
             }

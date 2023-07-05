@@ -257,18 +257,18 @@ function Reports() {
   };
 
   //pdf doc
-  const columns = [
-    "Date",
+  const headers = [
+    ["Date",
     "Ticket ID",
     "Domain",
     "Agency",
     "Work Type",
     "Hours",
     "User",
-    "Note"
+    "Note"]
   ];
   if(worklogs) {
-  var rows = worklogs.map((worklog) => [
+  var data = worklogs.map((worklog) => [
     worklog.date,
     worklog.ticketId,
     worklog.domain,
@@ -278,8 +278,7 @@ function Reports() {
     names.find((data) => data.id === worklog.user_id)?.name || "",
     worklog.note
   ]);}
-console.log(rows);
-console.log(columns)
+
   return (
     <div className="section">
       <div className="container">
@@ -369,9 +368,9 @@ console.log(columns)
 
         {reports && (
           <div className="my-4">
-            <div className="d-flex justify-content-between">
-              <h5>Total Hours: {total.toFixed(2)}</h5>
-              <ExportAsPDF rows={rows} columns={columns}/>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h5 className="total-hour">Total Hours: {total.toFixed(2)}</h5>
+              <ExportAsPDF headers={headers} data={data}/>
             </div>
             <div className="d-flex align-items-center justify-content-between mb-2">
               <div className="status">

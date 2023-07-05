@@ -13,6 +13,7 @@ function LeavePlan() {
   const [success, setSuccess] = React.useState(null);
   const [holidays, setHolidays] = React.useState([]);
   const [leaveDays, setLeaveDays] = React.useState([]);
+  const [filteredLeaves, setFilteredLeaves] = React.useState([]);
   const [totalLeave, setTotalLeave] = React.useState(0);
   let date = new Date();
   const [selectedDate, setSelectedDate] = React.useState(date);
@@ -25,9 +26,6 @@ function LeavePlan() {
 
       const json = await res.json();
       if (res.ok) {
-        // json.map((d) => {
-        //   console.log(new Date(d.date).toLocaleString('en-ca', {dateStyle: 'short'}));
-        // })
         setHolidays([...holidays, ...json.map((day) => ({ date: new Date(day.date), name: day.title }))])
       }
     }
@@ -77,6 +75,7 @@ React.useEffect(() => {
   }
 }, [userIds, user]);
 console.log(names)
+
   React.useEffect(() => {
     const fetchLeavedays = async () => {
       const res = await fetch("/api/user/leaves", {
@@ -105,8 +104,9 @@ console.log(names)
       const nextJune = currentMonth < 7 ? new Date(`${currentYear}-06-30`) : new Date(`${currentYear + 1}-06-30`);
 
       return leaveDate >= julyFirst && leaveDate <= nextJune;
-    }).length;
-    setTotalLeave(leavesCount);
+    });
+    setFilteredLeaves(leavesCount)
+    setTotalLeave(leavesCount.length);
   }, [leaveDays])
 
 
@@ -253,23 +253,31 @@ console.log(names)
           />
         </div>
         <div className="row mt-5">
-          <div className="col-md-6 leave-box">
-            <h3 className="text-center my-4">Total Leave: {totalLeave}</h3>
-            <ul className={leaveDays.length >= 6 ? 'arrow-list count-2' : 'arrow-list'}>
-              {leaveDays &&
-                leaveDays.map((leave, i) => (
-                  <li key={i}>{leave.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</li>
-                ))}
-            </ul>
-          </div>
-          <div className="col-md-6 leave-box">
-            <h3 className="text-center my-4">Todays on Leave</h3>
-            {names &&
-              <ul className={names.length >= 6 ? 'arrow-list count-2' : 'arrow-list'}>
-                {names.map((name, i) => (
-                  <li key={i}>{name.name}</li>))}
+          <div className="col-md-6">
+            <div className="leave-box">
+              <h3 className="text-center">Total Leave: {totalLeave}</h3>
+              <ul className={filteredLeaves.length >= 6 ? 'count-2' : ''}>
+                {filteredLeaves &&
+                  filteredLeaves.map((leave, i) => (
+                    <li key={i} className='d-flex align-items-center'><span className="material-symbols-outlined mr-2">
+                    event_busy
+                    </span>{leave.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</li>
+                  ))}
               </ul>
-            }
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="leave-box">
+              <h3 className="text-center">Todays on Leave</h3>
+              {names &&
+                <ul className={names.length >= 6 ? 'count-2' : ''}>
+                  {names.map((name, i) => (
+                    <li key={i} className='d-flex align-items-center'><span className="material-symbols-outlined mr-2">
+                    person_off
+                    </span>{name.name}</li>))}
+                </ul>
+              }
+            </div>
           </div>
         </div>
       </div>

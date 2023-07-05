@@ -199,6 +199,7 @@ export default React.memo(function Home() {
         }
       );
       const json = await response.json();
+      console.log(json)
       if(response.status === 401) {
         alert('You are not authorized to view this page. Please login.')
         logout();

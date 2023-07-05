@@ -34,8 +34,8 @@ const allWorklogs = async (req, res) => {
 const totalMonthlyWorklogs = async (req, res) => {
   const { month, year } = req.query;
 
-  const startDate = new Date(year, month - 1, 1).toISOString().substr(0, 10);
-  const endDate = new Date(year, month, 1, 0, 0, -1).toISOString().substr(0, 10);
+  const startDate = new Date(year, month - 1, 1, 0, 0, 0).toISOString();
+  const endDate = new Date(year, month, 0, 23, 59, 59).toISOString();
 
   const monthLogs = await Worklog.find({
     date: { $gte: startDate, $lte: endDate } 
@@ -74,8 +74,8 @@ const perMonthWorklogs = async (req, res) => {
   const { user_id } = req.params;
   const { month, year } = req.query;
 
-  const startDate = new Date(year, month - 1, 1).toISOString().substr(0, 10);
-  const endDate = new Date(year, month, 1, 0, 0, -1).toISOString().substr(0, 10);
+  const startDate = new Date(year, month - 1, 1, 0, 0, 0).toISOString();
+  const endDate = new Date(year, month, 0, 23, 59, 59).toISOString();
 
   const monthLogs = await Worklog.find({ 
     user_id: user_id,

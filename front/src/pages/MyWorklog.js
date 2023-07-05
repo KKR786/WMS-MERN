@@ -77,9 +77,10 @@ export default function MyWorklog() {
   }, [dispatch, user, selectedMonth]);
 
   // pagination
+  console.log(monthlyWorklogs)
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = startIndex + perPage;
-  if (monthlyWorklogs) {
+  if (Array.isArray(monthlyWorklogs)) {
     console.log(monthlyWorklogs.length, startIndex)
     var displayedWorklogs = monthlyWorklogs.slice(startIndex, endIndex);
   }
@@ -231,6 +232,7 @@ export default function MyWorklog() {
                           <th>Agency</th>
                           <th>Work Type</th>
                           <th>Hours</th>
+                          <th>Note</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -253,6 +255,7 @@ export default function MyWorklog() {
                               <td>{worklog.agency}</td>
                               <td>{worklog.type}</td>
                               <td>{(worklog.time / 60).toFixed(2)}</td>
+                              <td>{worklog.note}</td>
                             </tr>
                           ))}
                       </tbody>

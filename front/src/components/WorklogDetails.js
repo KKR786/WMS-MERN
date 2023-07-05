@@ -103,7 +103,7 @@ const WorklogDetails = ({ worklogs, date }) => {
                         <td>{worklog.agency}</td>
                         <td>{worklog.type}</td>
                         <td>{(worklog.time / 60).toFixed(2)}</td>
-                        <td>{worklog.usersTag.join(", ")}</td>
+                        <td>{worklog.usersTag.map((user) => user.label).join(", ")}</td>
                         <td>
                           <span
                             className="material-symbols-outlined btn editBtn"

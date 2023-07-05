@@ -92,7 +92,10 @@ const WorklogForm = (props) => {
     }
     let users = [];
     if(usersTag) {
-      usersTag.map((user, i) => users[i] = user.label);
+      users = usersTag.map((user) => ({
+        label: user.label,
+        value: user.value,
+      }));
       console.log(users);
     }
     console.log(users);
@@ -227,14 +230,6 @@ console.log(usersTag)
         />
       </div>
       <div className="entry">
-        <label>Note:</label>
-        <input
-          type="text"
-          onChange={(e) => setNote(e.target.value)}
-          value={note}
-        />
-      </div>
-      <div className="entry">
         <label>Tag User:</label>
         <Select 
           placeholder="Select User"
@@ -245,6 +240,15 @@ console.log(usersTag)
           id="type"
         />
       </div>
+      <div className="entry">
+        <label>Note:</label>
+        <textarea
+          type="text"
+          onChange={(e) => setNote(e.target.value)}
+          value={note}
+        />
+      </div>
+      
       <div className="entry">
         <button>Add</button>
       </div>

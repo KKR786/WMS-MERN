@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useWorklogsContext } from "../hooks/useWorklogsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
 import Select from "react-select";
@@ -10,11 +10,11 @@ export default function UpdateWorklog(props) {
   const [time, setTime] = useState("");
   const [type, setType] = useState("");
   const [note, setNote] = useState("");
-  const [users, setUsers] = useState([{}])
-  const [usersTag, setUsersTag] = useState([])
+  const [users, setUsers] = useState([]);
+  const [usersTag, setUsersTag] = useState([]);
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
-  const [domains, setDomains] = useState([{}]);
+  const [domains, setDomains] = useState([]);
   const [agencies, setAgencies] = useState([]);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -22,22 +22,19 @@ export default function UpdateWorklog(props) {
   const { worklog, dispatch } = useWorklogsContext();
   const { user } = useAuthContext();
 
-
-  React.useEffect(()=>{
-    if(worklog) {
-      console.log(worklog.usersTag)
-        setTicketId(worklog.ticketId);
-        setDomain(worklog.domain);
-        setAgency(worklog.agency);
-        setTime(worklog.time);
-        setType(worklog.type);
-        setNote(worklog.note);
-        setUsersTag(worklog.usersTag);
+  useEffect(() => {
+    if (worklog) {
+      setTicketId(worklog.ticketId);
+      setDomain(worklog.domain);
+      setAgency(worklog.agency);
+      setTime(worklog.time);
+      setType(worklog.type);
+      setNote(worklog.note);
+      setUsersTag(worklog.usersTag || []);
     }
-  },[worklog])
-  
-    
-  React.useEffect(() => {
+  }, [worklog]);
+
+  useEffect(() => {
     const fetchDomains = async () => {
       const res = await fetch("/api/system/domains", {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -45,9 +42,10 @@ export default function UpdateWorklog(props) {
       const json = await res.json();
 
       if (res.ok) {
-        console.log(json)
-        const domainList = json.map((data) => ({d: data.domain, a: data.agency}));
-        console.log(domainList)
+        const domainList = json.map((data) => ({
+          d: data.domain,
+          a: data.agency,
+        }));
         setDomains(domainList);
         const agencyList = [...new Set(json.map((data) => data.agency))];
         setAgencies(agencyList);
@@ -57,13 +55,13 @@ export default function UpdateWorklog(props) {
     if (user) {
       fetchDomains();
     }
-  },[user])
+  }, [user]);
 
   function handleMouseDown(event) {
     setIsDragging(true);
     setPosition({
       x: event.clientX - event.target.offsetLeft,
-      y: event.clientY - event.target.offsetTop
+      y: event.clientY - event.target.offsetTop,
     });
   }
 
@@ -78,24 +76,24 @@ export default function UpdateWorklog(props) {
   function handleMouseUp() {
     setIsDragging(false);
   }
-console.log(props.id)
-  React.useEffect(() => {
-    const fetchWorklogs = async () => {
-      const response = await fetch(`/api/worklogs/unique/${props.id}`, {
-        headers: {'Authorization': `Bearer ${user.token}`},
-      })
-      const json = await response.json()
-      console.log(json);
-      if (response.ok) {
-        dispatch({type: 'GET_WORKLOG', payload: json})
-      }
-    }
-    if (user) {
-      fetchWorklogs()
-    }
-  }, [dispatch, props.id, user])
 
-  console.log(worklog)
+  useEffect(() => {
+    const fetchWorklogs = async () => {
+      if (props.id) {
+        const response = await fetch(`/api/worklogs/unique/${props.id}`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const json = await response.json();
+        if (response.ok) {
+          dispatch({ type: "GET_WORKLOG", payload: json });
+        }
+      }
+    };
+
+    if (user) {
+      fetchWorklogs();
+    }
+  }, [dispatch, props.id, user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,12 +104,22 @@ console.log(props.id)
     }
 
     let users = [];
-    if(usersTag) {
-      usersTag.map((user, i) => users[i] = user.label);
-      console.log(users);
+    if (usersTag) {
+      users = usersTag.map((user) => ({
+        label: user.label,
+        value: user.value,
+      }));
     }
 
-    const worklog = { ticketId, domain, agency, time, type, note, usersTag: users };
+    const worklog = {
+      ticketId,
+      domain,
+      agency,
+      time,
+      type,
+      note,
+      usersTag: users,
+    };
 
     const response = await fetch(`/api/worklogs/${props.id}`, {
       method: "PATCH",
@@ -128,7 +136,7 @@ console.log(props.id)
       setEmptyFields(json.emptyFields);
     }
     if (response.ok) {
-      props.state(false)
+      props.state(false);
       setTicketId("");
       setDomain("");
       setAgency("");
@@ -142,18 +150,18 @@ console.log(props.id)
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchUsers = async () => {
-      const res = await fetch('/api/users', {
+      const res = await fetch("/api/users", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const json = await res.json();
 
       if (res.ok) {
-        const userList = json.map((data) => {return {
+        const userList = json.map((data) => ({
           name: data.name,
-          id: data._id
-        }});
+          id: data._id,
+        }));
         setUsers(userList);
       }
     };
@@ -161,102 +169,131 @@ console.log(props.id)
     if (user) {
       fetchUsers();
     }
-  }, [ user]);
+  }, [user]);
 
   return (
     <>
-    {worklog &&
-    <div className="form-popup">
-      <div className="popup-header" onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove}>
-        <span className="float-right top-0 cancel" onClick={()=>props.state(false)}>X</span>
-        <h3 className="text-center">Update Worklog</h3>
-      </div>
-      <form className="d-flex flex-wrap justify-content-between mt-5" onSubmit={handleSubmit}>
-        <div className="reEntry">
-          <label>Ticket Id:</label>
-          <input
-            type="number"
-            value={ticketId}
-            min="0"
-            onChange={(e) => setTicketId(e.target.value)}
-            className={emptyFields.includes("ticketId") ? "error" : ""}
-          />
-        </div>
+      {worklog && (
+        <div className="form-popup">
+          <div
+            className="popup-header"
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+          >
+            <span
+              className="float-right top-0 cancel"
+              onClick={() => props.state(false)}
+            >
+              X
+            </span>
+            <h3 className="text-center">Update Worklog</h3>
+          </div>
+          <form
+            className="d-flex flex-wrap justify-content-between mt-5"
+            onSubmit={handleSubmit}
+          >
+            <div className="reEntry">
+              <label>Ticket Id:</label>
+              <input
+                type="number"
+                value={ticketId}
+                min="0"
+                onChange={(e) => setTicketId(e.target.value)}
+                className={emptyFields.includes("ticketId") ? "error" : ""}
+              />
+            </div>
 
-        <div className="reEntry">
-        <label>Domain:</label>
-        <Select 
-          placeholder = {domain}
-          options = {domains.map((domain) => ({ value: domain.d, label: domain.d }))}
-          value={domains.find((obj) => obj.value === domain)}
-          onChange={(e) => {
-            setDomain(e.value);
-            const selectedDomain = e.value;
-            const filteredAgency = domains.find((domain) => domain.d === selectedDomain)?.a || [];
-            setAgency(filteredAgency);
-          }}
-          className={emptyFields.includes("domain") ? "error" : ""}
-          id="domain"
-        />
-      </div>
+            <div className="reEntry">
+              <label>Domain:</label>
+              <Select
+                placeholder={domain}
+                options={domains.map((domain) => ({
+                  value: domain.d,
+                  label: domain.d,
+                }))}
+                value={domains.find((obj) => obj.value === domain) || null}
+                onChange={(e) => {
+                  setDomain(e.value);
+                  const selectedDomain = e.value;
+                  const filteredAgency =
+                    domains.find((domain) => domain.d === selectedDomain)?.a ||
+                    [];
+                  setAgency(filteredAgency);
+                }}
+                className={emptyFields.includes("domain") ? "error" : ""}
+                id="domain"
+              />
+            </div>
 
-      <div className="reEntry">
-        <label>Agency:</label>
-        <Select 
-          placeholder = {agency ? agency : "Select Agency"}
-          options = {agencies.map((agency) => ({ value: agency, label:agency }))}
-          value={agencies.find(obj => obj.value === agency)}
-          onChange = {(e) => setAgency(e.value)} 
-          className = {emptyFields.includes("agency") ? "error" : ""}
-          id = "agency"
-        />
-      </div>
+            <div className="reEntry">
+              <label>Agency:</label>
+              <Select
+                placeholder={agency ? agency : "Select Agency"}
+                options={agencies.map((agency) => ({
+                  value: agency,
+                  label: agency,
+                }))}
+                value={agencies.find((obj) => obj.value === agency) || null}
+                onChange={(e) => setAgency(e.value)}
+                className={emptyFields.includes("agency") ? "error" : ""}
+                id="agency"
+              />
+            </div>
 
-        <div className="reEntry">
-          <label>Time (in min):</label>
-          <input
-            type="number"
-            onChange={(e) => setTime(e.target.value)}
-            value={time}
-            min="0"
-            className={emptyFields.includes("time") ? "error" : ""}
-          />
-        </div>
+            <div className="reEntry">
+              <label>Time (in min):</label>
+              <input
+                type="number"
+                value={time}
+                min="0"
+                onChange={(e) => setTime(e.target.value)}
+                className={emptyFields.includes("time") ? "error" : ""}
+              />
+            </div>
 
-        <div className="reEntry">
-          <label>Work Type:</label>
-          <input
-            type="text"
-            onChange={(e) => setType(e.target.value)}
-            value={type}
-            className={emptyFields.includes("type") ? "error" : ""}
-          />
-        </div>
-        <div className="reEntry">
-          <label>Note:</label>
-          <input
-            type="text"
-            onChange={(e) => setNote(e.target.value)}
-            value={note}
-          />
-        </div>
-        <div className="reEntry">
-          <label>Tag User:</label>
-          <Select 
-            placeholder="Select User"
-            isMulti
-            options={[...users.map((user) => ({ value: user.id, label: user.name }))]}
-            value={usersTag.map((user) => ({ value: user, label: user }))}
-            onChange={(option) => setUsersTag(option)}
-            id="type"
-          />
-        </div>
+            <div className="reEntry">
+              <label>Type:</label>
+              <input
+                type="text"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className={emptyFields.includes("type") ? "error" : ""}
+              />
+            </div>
 
-        <button className="updateBtn">Update</button>
-        {error && <div className="error">{error}</div>}
-      </form>
-    </div>
-    }
+            <div className="reEntry">
+              <label>Users:</label>
+              <Select
+                isMulti
+                options={users.map((user) => ({
+                  value: user.id,
+                  label: user.name,
+                }))}
+                value={usersTag}
+                onChange={(selectedUsers) => setUsersTag(selectedUsers)}
+                id="type"
+              />
+            </div>
+            
+            <div className="reEntry">
+              <label>Note:</label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                className={emptyFields.includes("note") ? "error" : ""}
+              />
+            </div>
+
+            {error && <div className="error-msg">{error}</div>}
+            
+              <button type="submit" className="updateBtn">
+                Update
+              </button>
+
+          </form>
+        </div>
+      )}
     </>
   );
 }

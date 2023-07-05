@@ -13,7 +13,7 @@ function Profile() {
   const [designation, setDesignation] = useState('');
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('')
+  const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
@@ -42,9 +42,41 @@ function Profile() {
   }, [user]);
   
   
-  const handleSubmit = () => {
-    console.log('hi')
-  }
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (!user) {
+        setError("You must be logged in");
+        return;
+      }
+
+      const userPasswords = { oldPassword, newPassword, confirmPassword };
+
+      const res = await fetch(`/api/user/change_password/${user.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(userPasswords),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error('Password update failed');
+      }
+      if(res.ok) {
+        setOldPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+        setSuccess('Password Updated Successfully');
+        setError(null);
+      }
+    } catch (error) {
+      setError(error.message);
+      setSuccess('');
+    }
+  };
 
   const handleUpdate = async (e) => {
     e.preventDefault()
@@ -56,7 +88,7 @@ function Profile() {
 
     const updatedUser = { name, email, company, department, designation, phone, location }
     
-    const res = await fetch(`/api/users/profile/${user.id}`, {
+    const res = await fetch(`/api/user/profile/${user.id}`, {
       method: 'PATCH',
       body: JSON.stringify(updatedUser),
       headers: {
@@ -140,12 +172,12 @@ function Profile() {
           <div className='col-xl-4'>
             <div className="my-profile">
               <h4 className="mb-4">Change password</h4>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handlePasswordChange}>
                 <label>Current Password:</label>
                 <input
                   type="password"
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  value={currentPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  value={oldPassword}
                   required
                 />
                 <label>New Password:</label>
@@ -166,6 +198,8 @@ function Profile() {
                   <button className="passBtn">
                     Change Password
                   </button>
+                  {error && <div className="error">{error}</div>}
+                  {success && <div className="success">{success}</div>}
                 </div>
               </form>
             </div>

@@ -2,6 +2,7 @@ const User = require('../models/userModel')
 const Leave = require('../models/leaveModel')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 
 const createToken = (_id) => {
   return jwt.sign({_id}, process.env.SECRET, { expiresIn: '30d' })
@@ -84,6 +85,44 @@ const updateUserProfile = async (req, res) => {
   }
 }
 
+// update user password
+const updateUserPassword = async (req, res) => {
+  const id = req.params._id;
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  if (isNaN(id)) {
+    return res.status(404).json({ error: `User${id} Not Found` });
+  }
+
+  const user = await User.findById({ _id: id });
+
+  if (!user) {
+    return res.status(404).json({ error: 'User Not Found' });
+  }
+
+  const match = await bcrypt.compare(oldPassword, user.password);
+
+  if (match) {
+    if (newPassword === confirmPassword) {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(newPassword, salt);
+
+      const updatedPassword = await User.findByIdAndUpdate({_id: id}, { password: hash });
+
+      if (!updatedPassword) {
+        return res.status(400).json({ error: 'Password update failed' });
+      } else {
+        return res.status(200).json(updatedPassword);
+      }
+    } else {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
+  } else {
+    return res.status(400).json({ error: 'Current password is incorrect' });
+  }
+};
+
+
 // Leave
 const takeLeave = async (req, res) => {
   const { leaveDate, leaveTitle } = req.body;
@@ -115,4 +154,4 @@ const todaysOnLeave = async (req, res) => {
   res.status(200).json(usersOnLeave)
 }
 
-module.exports = { signupUser, loginUser, updateUserProfile, getUsers, getUser, takeLeave, getLeave, todaysOnLeave }
+module.exports = { signupUser, loginUser, updateUserProfile, updateUserPassword, getUsers, getUser, takeLeave, getLeave, todaysOnLeave }
