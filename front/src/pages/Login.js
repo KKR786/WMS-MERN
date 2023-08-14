@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useLogin } from "../hooks/useLogin";
+import logo from "../assets/wms.svg";
+import thumb from "../assets/dashboard-thumb.jpg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,42 +23,53 @@ const Login = () => {
   };
 
   return (
-    <div className="bg-animation">
-      <div id="stars"></div>
-      <div id="stars2"></div>
-      <div id="stars3"></div>
-      <div id="stars4"></div>
-
-      <div className="login-box">
-      <h1 className="text-center">Sign In</h1>
-        <form className="login" onSubmit={handleSubmit}>
-          <label>Email:</label>
-          <input
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            required
-          />
-          <label>Password:</label>
-          <input
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            required
-          />
-          <div className="submit" /*req ? "submit" : "required"*/>
-            <button className="loginBtn" hidden={!(email && password)} disabled={isLoading}>
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-              Login
-            </button>
+    <>
+    <div className="login-block text-center">
+      <div className="login-block-start d-flex align-items-center justify-content-center">
+        <div>
+          <div className="mb-5 login-logo">
+            <img src={logo} alt="herse logo" />
           </div>
-          {error && <div className="error">{error}</div>}
-        </form>
+          <div className="mb-3 thumb">
+            <img src={thumb} alt="herse thumb" />
+          </div>
+          <div className="caption">Welcome to WMS</div>
+          <p>Efficient worklog management system <br/>for seamless task tracking and collaboration.</p>
+        </div>
+      </div>
+      <div className="login-block-end d-flex align-items-center justify-content-center">
+        <div className="login-box">
+          <h1 className="text-center mb-3">Log in</h1>
+          <form onSubmit={handleSubmit}>
+            <div className="login-group">
+              <label>Email:</label>
+              <input
+                type="email"
+                autoFocus
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="login-group">
+              <label>Password:</label>
+              <input
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="submit " /*req ? "submit" : "required"*/>
+              <button className="btn btn-primary w-100" disabled={isLoading}>
+                Log in
+              </button>
+            </div>
+            {error && <div className="error">{error}</div>}
+          </form>
+        </div>
       </div>
     </div>
+      <div className="copyright text-center">All copyrights reserved</div>
+      </>
   );
 };
 

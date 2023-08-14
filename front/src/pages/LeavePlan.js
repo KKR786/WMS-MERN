@@ -268,7 +268,7 @@ console.log(names)
           </div>
           <div className="col-md-6">
             <div className="leave-box">
-              <h3 className="text-center">Todays on Leave</h3>
+              <h3 className="text-center">Users on Leave</h3>
               {names &&
                 <ul className={names.length >= 6 ? 'count-2' : ''}>
                   {names.map((name, i) => (

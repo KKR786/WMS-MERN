@@ -8,6 +8,7 @@ import ExportAsPDF from "../components/ExportAsPDF";
 function Reports() {
   const { worklogs, dispatch } = useWorklogsContext();
   const { user } = useAuthContext();
+  const [loading, setLoading] = React.useState(true);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -146,6 +147,7 @@ function Reports() {
         } else if (response.status === 404) {
           setError(true);
           setReports(true);
+          setLoading(false);
         }
       } catch (error) {
         console.error(error);
@@ -166,6 +168,7 @@ function Reports() {
           id: data._id,
         }));
         setUsers(userList);
+        setLoading(false)
       }
     };
 
@@ -256,28 +259,95 @@ function Reports() {
     return pageItems;
   };
 
+  // specific reports
+  function getHourByDomain(dName) {
+    if (worklogs) {
+      let filteredData = worklogs.filter(
+        (worklog) => (dName === worklog.domain
+        ));
+      let filteredHours = filteredData.reduce(
+        (total, worklog) => total + worklog.time / 60,
+        0
+      );
+      return filteredHours;
+    }
+  }
+  function getHourByUser(uId) {
+    if (worklogs) {
+      let filteredData = worklogs.filter(
+        (worklog) => (uId === worklog.user_id
+        ));
+      let filteredHours = filteredData.reduce(
+        (total, worklog) => total + worklog.time / 60,
+        0
+      );
+      return filteredHours;
+    }
+  }
+  let domainsList = [];
+  let namesList = [];
+  if (worklogs) {
+    var uniqueDomains = [...new Set(worklogs.map((worklog) => worklog.domain))]
+    var uniqueUsers = [...new Set(worklogs.map((worklog) => worklog.user_id))]
+    for (let i = 0; i < uniqueDomains.length; i++) {
+      domainsList.push({ name: uniqueDomains[i], hours: getHourByDomain(uniqueDomains[i]).toFixed(2) })
+    }
+    domainsList.sort(function (a, b) {
+      return b.hours - a.hours;
+    })
+    for (let i = 0; i < uniqueUsers.length; i++) {
+      namesList.push({ uId: uniqueUsers[i], hours: getHourByUser(uniqueUsers[i]).toFixed(2) })
+    }
+    namesList.sort(function (a, b) {
+      return b.hours - a.hours;
+    })
+  }
+
   //pdf doc
+  //by Domain
+  const domainListHeaders = [
+    ["Domain", "Hours"]
+  ];
+  if (domainsList) {
+    var domainListData = domainsList.map((domain) => [
+      domain.name,
+      domain.hours
+    ]);
+  }
+  // by user
+  const userListHeaders = [
+    ["Name", "Hours"]
+  ];
+  if (namesList) {
+    var userListData = namesList.map((user) => [
+      names.find((data) => data.id === user.uId)
+        ?.name || "",
+      user.hours
+    ]);
+  }
+  // full Report
   const headers = [
     ["Date",
-    "Ticket ID",
-    "Domain",
-    "Agency",
-    "Work Type",
-    "Hours",
-    "User",
-    "Note"]
+      "Ticket ID",
+      "Domain",
+      "Agency",
+      "Work Type",
+      "Hours",
+      "User",
+      "Note"]
   ];
-  if(worklogs) {
-  var data = worklogs.map((worklog) => [
-    worklog.date,
-    worklog.ticketId,
-    worklog.domain,
-    worklog.agency,
-    worklog.type,
-    (worklog.time / 60).toFixed(2),
-    names.find((data) => data.id === worklog.user_id)?.name || "",
-    worklog.note
-  ]);}
+  if (worklogs) {
+    var data = worklogs.map((worklog) => [
+      worklog.date,
+      worklog.ticketId,
+      worklog.domain,
+      worklog.agency,
+      worklog.type,
+      (worklog.time / 60).toFixed(2),
+      names.find((data) => data.id === worklog.user_id)?.name || "",
+      worklog.note
+    ]);
+  }
 
   return (
     <div className="section">
@@ -361,38 +431,44 @@ function Reports() {
               id="type"
             />
           </div>
-          <div className="m-auto">
-            <button className="btn-info">Generate</button>
+          <div className="common-btn">
+            <button>Generate</button>
           </div>
         </form>
 
         {reports && (
+          <>
+          {loading ? (
+            <p>loading..</p>
+          ) : (
           <div className="my-4">
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h5 className="total-hour">Total Hours: {total.toFixed(2)}</h5>
-              <ExportAsPDF headers={headers} data={data}/>
+              <ExportAsPDF headers={domainListHeaders} data={domainListData} button="Export Report by Domains"/>
+              <ExportAsPDF headers={userListHeaders} data={userListData} button="Export Report by Users"/>
+              <ExportAsPDF headers={headers} data={data} button="Export Full Report"/>
             </div>
             <div className="d-flex align-items-center justify-content-between mb-2">
               <div className="status">
                 <span>{`${startIndex + 1} - ${Math.min(endIndex, worklogs.length)} of ${worklogs.length}`}</span>
               </div>
               <div>
-              {renderPaginationItems() != null &&
-                <Pagination>
-                  <Pagination.Prev
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  />
-                  {renderPaginationItems()}
-                  <Pagination.Next
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={
-                      currentPage ===
-                      Math.ceil(worklogs.length / perPage)
-                    }
-                  />
-                </Pagination>
-              }
+                {renderPaginationItems() != null &&
+                  <Pagination>
+                    <Pagination.Prev
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    />
+                    {renderPaginationItems()}
+                    <Pagination.Next
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={
+                        currentPage ===
+                        Math.ceil(worklogs.length / perPage)
+                      }
+                    />
+                  </Pagination>
+                }
               </div>
               <div className="d-flex align-items-center">
                 <span className="mr-2">Records per page</span>
@@ -463,6 +539,8 @@ function Reports() {
               </tbody>
             </table>
           </div>
+          )}
+          </>
         )}
       </div>
     </div>

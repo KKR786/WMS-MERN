@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useLogout } from "../hooks/useLogout";
 import { useAuthContext } from "../hooks/useAuthContext";
+import logo from "../assets/wms-white.svg";
 
 const Navbar = (props) => {
   const { logout } = useLogout();
@@ -22,11 +23,11 @@ const Navbar = (props) => {
       {user && (
         <div
           className="sidebar"
-          style={props.class ? { left: "0px" } : { left: "-250px" }}
+          style={props.class ? { left: "0px" } : { left: "-300px" }}
         >
           <nav className="navigation flex-column">
             <Link className="sidebar-brand mb-5" to="/">
-              <span className="align-middle">Herse WMS</span>
+              <img className="logo" src={logo} alt="herse logo" />
             </Link>
             <div className="scrollbar" id="scroll-style">
               <div className="force-overflow">

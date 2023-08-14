@@ -30,8 +30,7 @@ const userSchema = new Schema({
     type: String
   },
   phone: {
-    type: String,
-    required: true
+    type: String
   },
   location: {
     type: String

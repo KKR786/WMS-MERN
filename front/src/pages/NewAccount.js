@@ -61,14 +61,14 @@ const NewAccount = () => {
         onChange={(e) => setPassword(e.target.value)} 
         value={password} 
       />
-      <div className="row align-items-center">
+      {/* <div className="row align-items-center">
         <div className="col">
           <label>Will Maintain Worklog ?</label>
         </div>
-        {/* <div className="col-auto mt-1">
+        <div className="col-auto mt-1">
           <input type="checkbox" onChange={(e) => setMaintainable(e.target.checked)} value={maintainable} />
-        </div> */}
-      </div>
+        </div>
+      </div> */}
       <div className="addAccount">
           <button disabled={isLoading} className="addAccountBtn">Create</button>
       </div>

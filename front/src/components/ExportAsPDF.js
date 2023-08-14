@@ -7,9 +7,9 @@ const ExportAsPDF = (props) => {
     const doc = new jsPDF();
 
     //Calculate and display the total hours
-    const totalHours = props.data.reduce((total, row) => total + parseFloat(row[5]), 0);
+    const totalHours = props.data.reduce((total, row) => total + parseFloat(props.button === "Export Full Report" ? row[5] : row[1]), 0);
     doc.setFontSize(12);
-    doc.text(`Total Hours: ${totalHours.toFixed(2)}`, 10, 10);
+    doc.text(`Total Hours: ${totalHours.toFixed(2)}`, 14, 10);
 
     // Add the table to the PDF
     doc.autoTable({
@@ -37,7 +37,7 @@ const ExportAsPDF = (props) => {
    };
 
   return (
-    <button onClick={exportToPDF} className="btn btn-warning">Export as PDF</button>
+    <button onClick={exportToPDF} className="btn btn-warning">{props.button}</button>
   );
 };
 

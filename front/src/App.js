@@ -12,7 +12,7 @@ import Worklog from "./pages/Worklog";
 import LeavePlan from "./pages/LeavePlan";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
-import UsersProfile from "./pages/UsersProfile";
+import UsersProfile from "./pages/usersProfile";
 import ManageUsers from "./pages/ManageUsers";
 import SystemSettings from "./pages/SystemSettings";
 import MyWorklog from "./pages/MyWorklog";
@@ -27,7 +27,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
           <Navbar class={navClass}/>
-          <div className="content" style={(navClass ? {marginLeft: '250px'} : {marginLeft: '0px'})}>
+          <div className="content" style={(navClass ? {marginLeft: '300px'} : {marginLeft: '0px'})}>
             {user &&
             <TopBar class={setNavClass}/>
             }

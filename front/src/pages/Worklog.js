@@ -44,7 +44,10 @@ const Worklog = () => {
   return (
     <>
       {loading ? (
-        <p>loading..</p>
+        <div className="d-flex align-items-center text-center">
+          <div className="spinner-border mr-2"></div>
+          <span> loading...</span>	
+        </div>
       ) : (
         <div className="section">
           <div className="container">
